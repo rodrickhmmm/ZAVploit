@@ -14,38 +14,45 @@ for m in get_monitors():
 
 jmeno = None
 heslo = None
-browser = "firefox"
+prohlizec = "chromium"
+muzesSpustit = False
 
 def button_callback():
     print("button pressed")
     
 def spustitBrowser():
-    global jmeno, heslo
-    with sync_playwright() as p:
-        browser = p.firefox.launch(headless=False)
-        print("Program se spouští v rozlišení:", sirka,"x",vyska)
-        context = browser.new_context(
-            viewport={"width": sirka, "height": vyska}
-        ) 
-        page = context.new_page()
-        print("Program otevírá ZAV stránku...")
-        page.goto("https://student.zav.cz/#!/login")
-        print("Zadává jméno...")
-        time.sleep(.1)
-        pyautogui.typewrite(jmeno, interval=0)
-        pyautogui.press("tab")
-        print("Zadává heslo...")
-        pyautogui.typewrite(heslo, interval=0)
-        pyautogui.press("enter")
-        print("Přihlášen, teď dává exploit...")
-        page.evaluate("document.documentElement.setAttribute('contenteditable', 'true');")
-        print("Hotovo!")
-        input("Pro exitnutí s browseru zde odentruj: ")
-        browser.close()
+    global jmeno, heslo, muzesSpustit
+    if muzesSpustit == False:
+        print("Nejprve zadej jméno a heslo!")
+    else:
+        with sync_playwright() as p:
+            print("ZAVploit browser spuštěn")
+            print("Spouští se:", prohlizec)
+            if prohlizec == "firefox":
+                browser = p.firefox.launch(headless=False)
+            else:
+                browser = p.chromium.launch(headless=False)
+            print("Program se spouští v rozlišení:", sirka,"x",vyska)
+            context = browser.new_context(
+                viewport={"width": sirka, "height": vyska}
+            ) 
+            page = context.new_page()
+            print("Program otevírá ZAV stránku...")
+            page.goto("https://student.zav.cz/#!/login")
+            print("Zadává jméno...")
+            time.sleep(.1)
+            pyautogui.typewrite(jmeno, interval=0)
+            pyautogui.press("tab")
+            print("Zadává heslo...")
+            pyautogui.typewrite(heslo, interval=0)
+            pyautogui.press("enter")
+            print("Přihlášen, teď dává exploit...")
+            page.evaluate("document.documentElement.setAttribute('contenteditable', 'true');")
+            print("Hotovo!")
+            input("Pro exitnutí s browseru zde odentruj: ")
+            browser.close()
         
 def run_browser_thread():
-    print("ZAVploit browser spuštěn")
-    print("Spouští se:", browser)
     threading.Thread(target=spustitBrowser, daemon=True).start()
 
 
@@ -77,16 +84,18 @@ class App(customtkinter.CTk):
         self.button.grid(row=3, column=0, padx=10, pady=10, sticky="ew")
         
         def clicked():
-            global jmeno, heslo
+            global jmeno, heslo, muzesSpustit
             jmeno = jmenoentry.get()
             heslo = hesloentry.get()
             if jmeno != "":
                 print("Jméno a heslo bylo uloženo!")
+                muzesSpustit = True
             else:
                 print("Není zadané jméno")
             
             if heslo != "":
                 print("Jméno a heslo bylo uloženo!")
+                muzesSpustit = True
             else:
                 print("Není zadané heslo")
         
