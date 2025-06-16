@@ -75,6 +75,8 @@ class App(customtkinter.CTk):
         self.grid_rowconfigure(0, weight=1)
         self.iconbitmap('icon.ico')
         
+        label = customtkinter.CTkLabel(self, text=("Vybrany prohlizec: " + prohlizec), font=("Sergoe UI", 20),text_color="white", fg_color="transparent").place(x=400,y=10)
+        
         self.button = customtkinter.CTkButton(
             self,
             text="Spustit ZAVploit",
