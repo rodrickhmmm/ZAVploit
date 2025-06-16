@@ -1,0 +1,4 @@
+customtkinter==5.2.2
+playwright==1.52.0
+PyAutoGUI==0.9.54
+screeninfo==0.8.1
