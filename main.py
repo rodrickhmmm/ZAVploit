@@ -7,6 +7,10 @@ import pyautogui
 from screeninfo import get_monitors
 import customtkinter
 import threading
+import os
+
+def clear():
+    os.system('cls' if os.name == 'nt' else 'clear')
 
 for m in get_monitors():
     vyska = m.height
@@ -14,7 +18,7 @@ for m in get_monitors():
 
 jmeno = None
 heslo = None
-prohlizec = "chromium"
+prohlizec = "firefox"
 muzesSpustit = False
 
 def button_callback():
@@ -26,6 +30,7 @@ def spustitBrowser():
         print("Nejprve zadej jméno a heslo!")
     else:
         with sync_playwright() as p:
+            clear()
             print("ZAVploit browser spuštěn")
             print("Spouští se:", prohlizec)
             if prohlizec == "firefox":
@@ -68,6 +73,7 @@ class App(customtkinter.CTk):
         self.resizable(width= False, height = False)
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
+        self.iconbitmap('icon.ico')
         
         self.button = customtkinter.CTkButton(
             self,
@@ -80,8 +86,7 @@ class App(customtkinter.CTk):
             text_color="white",
             command=run_browser_thread,
             hover_color="#116970"
-        )
-        self.button.grid(row=3, column=0, padx=10, pady=10, sticky="ew")
+        ).grid(row=1, column=0, padx=10, pady=10, sticky="ew")
         
         def clicked():
             global jmeno, heslo, muzesSpustit
@@ -104,8 +109,8 @@ class App(customtkinter.CTk):
                                             width=300,
                                             height=40,
                                             font=("Sergoe UI", 20)
-        )
-        jmenoentry.place(x=20, y=10)
+        ).place(x=20, y=10)
+        
         
         hesloentry = customtkinter.CTkEntry(self,
                                             placeholder_text="Zadej heslo",
@@ -113,10 +118,9 @@ class App(customtkinter.CTk):
                                             height=40,
                                             font=("Sergoe UI", 20),
                                             show="*"
-        )
-        hesloentry.place(x=20, y=60)
+        ).place(x=20, y=60)
         
-        btnmeno = customtkinter.CTkButton(
+        ulozitUdajeBTN = customtkinter.CTkButton(
             self,
             text="Uložit udaje",
             font=("Sergoe UI", 40),
@@ -126,9 +130,8 @@ class App(customtkinter.CTk):
             text_color="white",
             command=clicked,
             hover_color="#116970",
-        )
+        ).place(x=20,y=110)
         
-        btnmeno.place(x=20,y=110)
 
 print("==================")
 print("")
