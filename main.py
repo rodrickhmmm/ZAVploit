@@ -23,14 +23,16 @@ muzesSpustit = False
 def button_callback():
     print("button pressed")
 
-
+def placeError(x,y):
+    app.error.place(x=x,y=y)
+    
 def spustitBrowser():
-    global jmeno, heslo, muzesSpustit, prohlizec, error
+    global jmeno, heslo, muzesSpustit, prohlizec
     if muzesSpustit == False:
+        placeError(70,250)
         print("Nejprve zadej jméno a heslo!")
-        error = customtkinter.CTkLabel(app, text="Nejprve zadej jméno a heslo!", text_color="red", font=("Courier New", 40)).place(x=70,y=250)
+        
     else:
-        error = customtkinter.CTkLabel(app, text="", text_color="red", font=("Courier New", 40)).place(x=70,y=250)
         with sync_playwright() as p:
             clear()
             print("ZAVploit browser spuštěn")
@@ -107,6 +109,11 @@ class App(customtkinter.CTk):
             else:
                 print("Není zadané heslo")
                 muzesSpustit = False
+                
+            if heslo and jmeno !="":
+                placeError(690,4200)
+            else:
+                placeError(70,250)
         
         jmenoentry = customtkinter.CTkEntry(self,
                                             placeholder_text="Zadej jméno",
@@ -128,10 +135,10 @@ class App(customtkinter.CTk):
         
         ulozitUdajeBTN = customtkinter.CTkButton(
             self,
-            text="Uložit udaje",
+            text="Dočasně uložit",
             font=("Sergoe UI", 40),
             fg_color="#1CABB2",
-            corner_radius=20,
+            corner_radius=50,
             width=300,
             text_color="white",
             command=clicked,
@@ -150,7 +157,9 @@ class App(customtkinter.CTk):
                 print("chrome zvolen")
                 prohlizec = "chrome"
                 self.checkbox_firefox.toggle()
-            else:
+            elif anoNe2 == "off":
+                prohlizec = "firefox"
+                print("x")
                 self.checkbox_chrome.deselect()
                 self.checkbox_firefox.select()
 
@@ -163,7 +172,9 @@ class App(customtkinter.CTk):
                 print("firefox zvolen")
                 prohlizec = "firefox"
                 self.checkbox_chrome.toggle()
-            else:
+            elif anoNe == "off":
+                prohlizec = "chrome"
+                print("-")
                 self.checkbox_firefox.deselect()
                 self.checkbox_chrome.select()
 
@@ -173,10 +184,11 @@ class App(customtkinter.CTk):
                                                     text="Firefox",
                                                     font=("Sergoe UI", 30),
                                                     text_color="white",
-                                                    hover_color="green",
+                                                    hover_color="#1CABB2",
                                                     variable=check_firefox,
                                                     onvalue="on",
                                                     offvalue="off",
+                                                    fg_color="#1CABB2",
                                                     command=checkbox_event)
         self.checkbox_firefox.place(x=400,y=50)
         
@@ -186,12 +198,16 @@ class App(customtkinter.CTk):
                                                     text="Chrome",
                                                     font=("Sergoe UI", 30),
                                                     text_color="white",
-                                                    hover_color="green",
+                                                    hover_color="#1CABB2",
                                                     variable=check_chrome,
                                                     onvalue="on",
                                                     offvalue="off",
+                                                    fg_color="#1CABB2",
                                                     command=checkbox_event2)
         self.checkbox_chrome.place(x=400,y=90)
+        
+        
+        self.error = customtkinter.CTkLabel(self, text="Nejprve zadej jméno a heslo!", text_color="red", font=("Courier New", 40, "bold"))
         
         
         
