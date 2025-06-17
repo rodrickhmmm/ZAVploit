@@ -22,12 +22,15 @@ muzesSpustit = False
 
 def button_callback():
     print("button pressed")
-    
+
+
 def spustitBrowser():
-    global jmeno, heslo, muzesSpustit, prohlizec
+    global jmeno, heslo, muzesSpustit, prohlizec, error
     if muzesSpustit == False:
         print("Nejprve zadej jméno a heslo!")
+        error = customtkinter.CTkLabel(app, text="Nejprve zadej jméno a heslo!", text_color="red", font=("Courier New", 40)).place(x=70,y=250)
     else:
+        error = customtkinter.CTkLabel(app, text="", text_color="red", font=("Courier New", 40)).place(x=70,y=250)
         with sync_playwright() as p:
             clear()
             print("ZAVploit browser spuštěn")
@@ -64,7 +67,7 @@ def run_browser_thread():
 class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
-        global jmeno, heslo, prohlizec
+        global jmeno, heslo, prohlizec, check_firefox
         customtkinter.set_appearance_mode("system")
         self.configure(fg_color="#252527")
         self.title("ZAVploit")
@@ -135,30 +138,62 @@ class App(customtkinter.CTk):
             hover_color="#116970",
         ).place(x=20,y=110)
         
+        label = customtkinter.CTkLabel(self, text=("Vyber prohlížeč:"), font=("Sergoe UI", 30),text_color="white", fg_color="transparent").place(x=400,y=10)
+        
+        
+        def checkbox_event2():
+            global anoNe2
+            anoNe2 = check_chrome.get()
+            global prohlizec, check_firefox
+            
+            if anoNe2 == "on":
+                print("chrome zvolen")
+                prohlizec = "chrome"
+                self.checkbox_firefox.toggle()
+            else:
+                self.checkbox_chrome.deselect()
+                self.checkbox_firefox.select()
+
+                
         def checkbox_event():
-            anoNe = check_var.get()
-            global prohlizec
+            anoNe = check_firefox.get()
+            global prohlizec, check_chrome, anoNe2
             
             if anoNe == "on":
                 print("firefox zvolen")
                 prohlizec = "firefox"
-                label = customtkinter.CTkLabel(self, text=("Vybrany prohlizec: " + prohlizec), font=("Sergoe UI", 20),text_color="white", fg_color="transparent").place(x=400,y=10)
-                
+                self.checkbox_chrome.toggle()
             else:
-                print("chrome zvolen")
-                prohlizec = "chrome"
-                label = customtkinter.CTkLabel(self, text=("Vybrany prohlizec: " + prohlizec), font=("Sergoe UI", 20),text_color="white", fg_color="transparent").place(x=400,y=10)
+                self.checkbox_firefox.deselect()
+                self.checkbox_chrome.select()
+
                 
-        check_var = customtkinter.StringVar(value="off")
-        self.checkbox_1 = customtkinter.CTkCheckBox(self,
+        check_firefox = customtkinter.StringVar(value="on")
+        self.checkbox_firefox = customtkinter.CTkCheckBox(self,
                                                     text="Firefox",
                                                     font=("Sergoe UI", 30),
                                                     text_color="white",
                                                     hover_color="green",
-                                                    variable=check_var,
+                                                    variable=check_firefox,
                                                     onvalue="on",
                                                     offvalue="off",
-                                                    command=checkbox_event).place(x=400,y=40)
+                                                    command=checkbox_event)
+        self.checkbox_firefox.place(x=400,y=50)
+        
+                
+        check_chrome = customtkinter.StringVar(value="off")
+        self.checkbox_chrome = customtkinter.CTkCheckBox(self,
+                                                    text="Chrome",
+                                                    font=("Sergoe UI", 30),
+                                                    text_color="white",
+                                                    hover_color="green",
+                                                    variable=check_chrome,
+                                                    onvalue="on",
+                                                    offvalue="off",
+                                                    command=checkbox_event2)
+        self.checkbox_chrome.place(x=400,y=90)
+        
+        
         
 
 print("==================")
