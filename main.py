@@ -1,6 +1,5 @@
 # ZAVploit
 
-
 from playwright.sync_api import sync_playwright
 import time
 import pyautogui
@@ -25,7 +24,7 @@ def button_callback():
     print("button pressed")
     
 def spustitBrowser():
-    global jmeno, heslo, muzesSpustit
+    global jmeno, heslo, muzesSpustit, prohlizec
     if muzesSpustit == False:
         print("Nejprve zadej jméno a heslo!")
     else:
@@ -65,7 +64,7 @@ def run_browser_thread():
 class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
-        global jmeno, heslo
+        global jmeno, heslo, prohlizec
         customtkinter.set_appearance_mode("system")
         self.configure(fg_color="#252527")
         self.title("ZAVploit")
@@ -74,8 +73,6 @@ class App(customtkinter.CTk):
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
         self.iconbitmap('icon.ico')
-        
-        label = customtkinter.CTkLabel(self, text=("Vybrany prohlizec: " + prohlizec), font=("Sergoe UI", 20),text_color="white", fg_color="transparent").place(x=400,y=10)
         
         self.button = customtkinter.CTkButton(
             self,
@@ -99,19 +96,22 @@ class App(customtkinter.CTk):
                 muzesSpustit = True
             else:
                 print("Není zadané jméno")
+                muzesSpustit = False
             
             if heslo != "":
                 print("Jméno a heslo bylo uloženo!")
                 muzesSpustit = True
             else:
                 print("Není zadané heslo")
+                muzesSpustit = False
         
         jmenoentry = customtkinter.CTkEntry(self,
                                             placeholder_text="Zadej jméno",
                                             width=300,
                                             height=40,
                                             font=("Sergoe UI", 20)
-        ).place(x=20, y=10)
+        )
+        jmenoentry.place(x=20, y=10)
         
         
         hesloentry = customtkinter.CTkEntry(self,
@@ -120,7 +120,8 @@ class App(customtkinter.CTk):
                                             height=40,
                                             font=("Sergoe UI", 20),
                                             show="*"
-        ).place(x=20, y=60)
+        )
+        hesloentry.place(x=20, y=60)
         
         ulozitUdajeBTN = customtkinter.CTkButton(
             self,
@@ -133,6 +134,31 @@ class App(customtkinter.CTk):
             command=clicked,
             hover_color="#116970",
         ).place(x=20,y=110)
+        
+        def checkbox_event():
+            anoNe = check_var.get()
+            global prohlizec
+            
+            if anoNe == "on":
+                print("firefox zvolen")
+                prohlizec = "firefox"
+                label = customtkinter.CTkLabel(self, text=("Vybrany prohlizec: " + prohlizec), font=("Sergoe UI", 20),text_color="white", fg_color="transparent").place(x=400,y=10)
+                
+            else:
+                print("chrome zvolen")
+                prohlizec = "chrome"
+                label = customtkinter.CTkLabel(self, text=("Vybrany prohlizec: " + prohlizec), font=("Sergoe UI", 20),text_color="white", fg_color="transparent").place(x=400,y=10)
+                
+        check_var = customtkinter.StringVar(value="off")
+        self.checkbox_1 = customtkinter.CTkCheckBox(self,
+                                                    text="Firefox",
+                                                    font=("Sergoe UI", 30),
+                                                    text_color="white",
+                                                    hover_color="green",
+                                                    variable=check_var,
+                                                    onvalue="on",
+                                                    offvalue="off",
+                                                    command=checkbox_event).place(x=400,y=40)
         
 
 print("==================")
