@@ -7,6 +7,7 @@ from screeninfo import get_monitors
 import customtkinter
 import threading
 import os
+from PIL import Image
 
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -115,13 +116,18 @@ class App(customtkinter.CTk):
             else:
                 placeError(70,250)
         
+        jmenoText = customtkinter.CTkLabel(self,text="Jméno",text_color="white", font=("Sergoe UI", 30)).place(x=20 , y=20)
+        
+        
         jmenoentry = customtkinter.CTkEntry(self,
                                             placeholder_text="Zadej jméno",
                                             width=300,
                                             height=40,
                                             font=("Sergoe UI", 20)
         )
-        jmenoentry.place(x=20, y=10)
+        jmenoentry.place(x=20, y=50)
+        
+        hesloText = customtkinter.CTkLabel(self,text="Heslo",text_color="white", font=("Sergoe UI", 30)).place(x=20 , y=97)
         
         
         hesloentry = customtkinter.CTkEntry(self,
@@ -131,7 +137,7 @@ class App(customtkinter.CTk):
                                             font=("Sergoe UI", 20),
                                             show="*"
         )
-        hesloentry.place(x=20, y=60)
+        hesloentry.place(x=20, y=130)
         
         ulozitUdajeBTN = customtkinter.CTkButton(
             self,
@@ -143,7 +149,7 @@ class App(customtkinter.CTk):
             text_color="white",
             command=clicked,
             hover_color="#116970",
-        ).place(x=20,y=110)
+        ).place(x=20,y=180)
         
         label = customtkinter.CTkLabel(self, text=("Vyber prohlížeč:"), font=("Sergoe UI", 30),text_color="white", fg_color="transparent").place(x=400,y=10)
         
@@ -154,12 +160,12 @@ class App(customtkinter.CTk):
             global prohlizec, check_firefox
             
             if anoNe2 == "on":
-                print("chrome zvolen")
                 prohlizec = "chrome"
+                print(prohlizec, "zvolen")
                 self.checkbox_firefox.toggle()
             elif anoNe2 == "off":
                 prohlizec = "firefox"
-                print("x")
+                print(prohlizec, "zvolen")
                 self.checkbox_chrome.deselect()
                 self.checkbox_firefox.select()
 
@@ -169,12 +175,12 @@ class App(customtkinter.CTk):
             global prohlizec, check_chrome, anoNe2
             
             if anoNe == "on":
-                print("firefox zvolen")
                 prohlizec = "firefox"
+                print(prohlizec, "zvolen")
                 self.checkbox_chrome.toggle()
             elif anoNe == "off":
                 prohlizec = "chrome"
-                print("-")
+                print(prohlizec, "zvolen")
                 self.checkbox_firefox.deselect()
                 self.checkbox_chrome.select()
 
