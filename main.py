@@ -28,7 +28,7 @@ def button_callback():
 def spustitBrowser():
     global jmeno, heslo, muzesSpustit, prohlizec
     if muzesSpustit == False:
-        app.error.place(x=70,y=250)
+        app.error.place(x=60,y=260)
         print("Nejprve zadej jméno a heslo!")
         
     else:
@@ -62,17 +62,6 @@ def spustitBrowser():
         
 def run_browser_thread():
     threading.Thread(target=spustitBrowser, daemon=True).start()
-
-class MyTabView(customtkinter.CTkTabview):
-    def __init__(self, master, **kwargs):
-        super().__init__(master, **kwargs)
-
-        # create tabs
-        self.add("tab 1")
-        self.add("tab 2")
-
-        # add widgets on tabs
-        self.label = customtkinter.CTkLabel(master=self.tab("tab 1"))
         
 class App(customtkinter.CTk):
     def __init__(self):
@@ -80,22 +69,83 @@ class App(customtkinter.CTk):
         global jmeno, heslo, prohlizec, check_firefox
         self.title("ZAVploit")
         self.geometry("800x400")
-        self.resizable(width= False, height = False)
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(0, weight=1)
+        self.resizable(width=False, height=False)
         self.iconbitmap('icon.ico')
-        
         customtkinter.set_default_color_theme("zav.json")
-        
-        # --- TABVIEW ---
-        self.tabview = customtkinter.CTkTabview(self, width=800, height=400)
-        self.tabview.pack(expand=True, fill="both")
+        #self.configure(bg="#242424")
 
-        self.tabview.add("Hlavní")
-        self.tabview.add("O aplikaci")
+        # --- NAČTENÍ IKON ---
+        self.home_icon = customtkinter.CTkImage(
+            light_image=Image.open("home_icon.png"),
+            dark_image=Image.open("home_icon.png"),
+            size=(40, 40)
+        )
+        self.settings_icon = customtkinter.CTkImage(
+            light_image=Image.open("settings_icon.png"),
+            dark_image=Image.open("settings_icon.png"),
+            size=(40, 40)
+        )
+        self.logo_icon = customtkinter.CTkImage(
+            light_image=Image.open("logo.png"),
+            dark_image=Image.open("logo.png"),
+            size=(120, 120)
+        )
+
+        # --- BUTTONY NA LEVÉ STRANĚ ---
+        self.menu_frame = customtkinter.CTkFrame(self, width=150)
+        self.menu_frame.pack(side="left", fill="y")
         
-        hlavni = self.tabview.tab("Hlavní")
+        self.icon_logo = customtkinter.CTkLabel(
+            self.menu_frame,
+            text="",
+            image=self.logo_icon,
+            width=80,
+            height=80)
+        self.icon_logo.pack(pady=(0,20),padx=10)
         
+        self.btn_hlavni = customtkinter.CTkButton(
+            self.menu_frame,
+            text="",  # bez textu, jen ikona
+            image=self.home_icon,
+            width=70,
+            height=70,
+            command=self.show_hlavni
+        )
+        self.btn_hlavni.pack(pady=(0,40), padx=10)
+
+        self.btn_about = customtkinter.CTkButton(
+            self.menu_frame,
+            text="",  # bez textu, jen ikona
+            image=self.settings_icon,
+            width=70,
+            height=70,
+            command=self.show_about
+        )
+        self.btn_about.pack(pady=0, padx=10)
+
+        # --- OBSAHOVÉ FRAMY ---
+        self.content_frame = customtkinter.CTkFrame(self)
+        self.content_frame.pack(side="left", fill="both", expand=True)
+
+        self.hlavni_frame = customtkinter.CTkFrame(self.content_frame)
+        self.about_frame = customtkinter.CTkFrame(self.content_frame)
+
+        self.create_hlavni_content()
+        self.create_about_content()
+
+        self.show_hlavni()  # výchozí zobrazení
+
+    def show_hlavni(self):
+        self.about_frame.pack_forget()
+        self.hlavni_frame.pack(fill="both", expand=True)
+
+    def show_about(self):
+        self.hlavni_frame.pack_forget()
+        self.about_frame.pack(fill="both", expand=True)
+
+    def create_hlavni_content(self):
+        hlavni = self.hlavni_frame
+
         def clicked():
             global jmeno, heslo, muzesSpustit
             jmeno = jmenoentry.get()
@@ -115,17 +165,16 @@ class App(customtkinter.CTk):
                 muzesSpustit = False
                 
             if heslo and jmeno !="":
-                app.error.place(x=690,y=1547)
+                self.error.place_forget()
             else:
-                app.error.place(x=70,y=250)
-        
-        jmenoText = customtkinter.CTkLabel(self,
+                self.error.place(x=60,y=260)
+
+        jmenoText = customtkinter.CTkLabel(hlavni,
                                            text="Jméno",
                                            font=("Sergoe UI", 30))
         jmenoText.place(x=20 , y=20)
         
-        
-        jmenoentry = customtkinter.CTkEntry(self,
+        jmenoentry = customtkinter.CTkEntry(hlavni,
                                             placeholder_text="Zadej jméno",
                                             width=300,
                                             height=40,
@@ -133,10 +182,10 @@ class App(customtkinter.CTk):
         )
         jmenoentry.place(x=20, y=50)
         
-        hesloText = customtkinter.CTkLabel(self,text="Heslo",text_color="white", font=("Sergoe UI", 30)).place(x=20 , y=97)
+        hesloText = customtkinter.CTkLabel(hlavni, text="Heslo", font=("Sergoe UI", 30))
+        hesloText.place(x=20 , y=97)
         
-        
-        hesloentry = customtkinter.CTkEntry(self,
+        hesloentry = customtkinter.CTkEntry(hlavni,
                                             placeholder_text="Zadej heslo",
                                             width=300,
                                             height=40,
@@ -146,24 +195,21 @@ class App(customtkinter.CTk):
         hesloentry.place(x=20, y=130)
         
         ulozitUdajeBTN = customtkinter.CTkButton(
-            self,
+            hlavni,
             text="Dočasně uložit",
             font=("", 40),
-            #fg_color="#1CABB2",
             corner_radius=50,
             width=300,
             text_color="white",
             command=clicked,
-            #hover_color="#116970",
         )
         ulozitUdajeBTN.place(x=20,y=180)
         
-        label = customtkinter.CTkLabel(self,
+        label = customtkinter.CTkLabel(hlavni,
                                        text=("Vyber prohlížeč:"),
                                        font=("Sergoe UI", 30),
                                        text_color="white")
         label.place(x=400,y=40)
-        
         
         def checkbox_event2():
             global anoNe2
@@ -180,7 +226,6 @@ class App(customtkinter.CTk):
                 self.checkbox_chrome.deselect()
                 self.checkbox_firefox.select()
 
-                
         def checkbox_event():
             anoNe = check_firefox.get()
             global prohlizec, check_chrome, anoNe2
@@ -195,56 +240,46 @@ class App(customtkinter.CTk):
                 self.checkbox_firefox.deselect()
                 self.checkbox_chrome.select()
 
-                
         check_firefox = customtkinter.StringVar(value="on")
-        self.checkbox_firefox = customtkinter.CTkCheckBox(self,
+        self.checkbox_firefox = customtkinter.CTkCheckBox(hlavni,
                                                     text="Firefox",
                                                     font=("Sergoe UI", 30),
                                                     text_color="white",
-                                                    #hover_color="#1CABB2",
                                                     variable=check_firefox,
                                                     onvalue="on",
                                                     offvalue="off",
-                                                    #fg_color="#1CABB2",
                                                     command=checkbox_event)
         self.checkbox_firefox.place(x=400,y=80)
         
-                
         check_chrome = customtkinter.StringVar(value="off")
-        self.checkbox_chrome = customtkinter.CTkCheckBox(self,
+        self.checkbox_chrome = customtkinter.CTkCheckBox(hlavni,
                                                     text="Chrome",
                                                     font=("Sergoe UI", 30),
                                                     text_color="white",
-                                                    #hover_color="#1CABB2",
                                                     variable=check_chrome,
                                                     onvalue="on",
                                                     offvalue="off",
-                                                    #fg_color="#1CABB2",
                                                     command=checkbox_event2)
         self.checkbox_chrome.place(x=400,y=130)
         
-        
-        self.error = customtkinter.CTkLabel(self, text="Nejprve zadej jméno a heslo!", text_color="red", font=("Courier New", 40, "bold"))
+        self.error = customtkinter.CTkLabel(hlavni, text="Nejprve zadej jméno a heslo!", text_color="red", font=("Courier New", 35, "bold"))
         
         self.button = customtkinter.CTkButton(
-            self,
+            hlavni,
             text="Spustit ZAVploit",
             font=("Sergoe UI", 50),
-            #fg_color="#1CABB2",
             corner_radius=20,
-            width=500,
-            height=80,
+            height=70,
             text_color="white",
             command=run_browser_thread,
-            #hover_color="#116970"
         )
-        self.button.pack(padx=10, pady=10, fill="x")
-        
-        about = self.tabview.tab("O aplikaci")
+        self.button.pack(side="bottom", fill="x", padx=20, pady=20)
+
+    def create_about_content(self):
+        about = self.about_frame
         about_label = customtkinter.CTkLabel(about, text="ZAVploit\nAutor: Rodrick\n2025", font=("Sergoe UI", 30), text_color="white")
         about_label.pack(pady=50)
-        
-        
+
 
 print("==================")
 print("")
@@ -254,4 +289,3 @@ print("==================")
 
 app = App()
 app.mainloop()
-
