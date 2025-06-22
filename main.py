@@ -62,7 +62,17 @@ def spustitBrowser():
         
 def run_browser_thread():
     threading.Thread(target=spustitBrowser, daemon=True).start()
-        
+
+def changethemezav():
+    print("zavtheme")
+    customtkinter.set_default_color_theme("themes\zav.json")
+    app.recreate_content()  # přidejte tuto metodu do třídy App
+
+def changethemebreeze():
+    print("breezetheme")
+    customtkinter.set_default_color_theme("themes\breeze.json")
+    app.recreate_content()  # přidejte tuto metodu do třídy App
+            
 class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
@@ -70,24 +80,24 @@ class App(customtkinter.CTk):
         self.title("ZAVploit")
         self.geometry("800x400")
         self.resizable(width=False, height=False)
-        self.iconbitmap('icon.ico')
-        customtkinter.set_default_color_theme("zav.json")
+        self.iconbitmap('ikonky\icon.ico')
+        customtkinter.set_default_color_theme("themes\zav.json")
         #self.configure(bg="#242424")
 
         # --- NAČTENÍ IKON ---
         self.home_icon = customtkinter.CTkImage(
-            light_image=Image.open("home_icon.png"),
-            dark_image=Image.open("home_icon.png"),
+            light_image=Image.open("ikonky\home_icon.png"),
+            dark_image=Image.open("ikonky\home_icon.png"),
             size=(40, 40)
         )
         self.settings_icon = customtkinter.CTkImage(
-            light_image=Image.open("settings_icon.png"),
-            dark_image=Image.open("settings_icon.png"),
+            light_image=Image.open("ikonky\settings_icon.png"),
+            dark_image=Image.open("ikonky\settings_icon.png"),
             size=(40, 40)
         )
         self.logo_icon = customtkinter.CTkImage(
-            light_image=Image.open("logo.png"),
-            dark_image=Image.open("logo.png"),
+            light_image=Image.open("ikonky\logo.png"),
+            dark_image=Image.open("ikonky\logo.png"),
             size=(120, 120)
         )
 
@@ -279,7 +289,57 @@ class App(customtkinter.CTk):
         about = self.about_frame
         about_label = customtkinter.CTkLabel(about, text="ZAVploit\nAutor: Rodrick\n2025", font=("Sergoe UI", 30), text_color="white")
         about_label.pack(pady=50)
+            
+        self.zavbtn = customtkinter.CTkButton(about, text="ZAV theme", command=changethemezav,font=("Segoe UI", 30))
+        self.zavbtn.place(x=200,y=200)
+        
+        self.zavbtn = customtkinter.CTkButton(about, text="Breeze theme", command=changethemebreeze,font=("Segoe UI", 30))
+        self.zavbtn.place(x=200,y=250)
+        
+    def recreate_content(self):
+        # Zničit staré framy včetně menu_frame
+        self.menu_frame.destroy()
+        self.content_frame.destroy()
+        # Vytvořit znovu menu_frame a content_frame
+        self.menu_frame = customtkinter.CTkFrame(self, width=150)
+        self.menu_frame.pack(side="left", fill="y")
 
+        self.icon_logo = customtkinter.CTkLabel(
+            self.menu_frame,
+            text="",
+            image=self.logo_icon,
+            width=80,
+            height=80)
+        self.icon_logo.pack(pady=(0,20),padx=10)
+
+        self.btn_hlavni = customtkinter.CTkButton(
+            self.menu_frame,
+            text="",
+            image=self.home_icon,
+            width=70,
+            height=70,
+            command=self.show_hlavni
+        )
+        self.btn_hlavni.pack(pady=(0,40), padx=10)
+
+        self.btn_about = customtkinter.CTkButton(
+            self.menu_frame,
+            text="",
+            image=self.settings_icon,
+            width=70,
+            height=70,
+            command=self.show_about
+        )
+        self.btn_about.pack(pady=0, padx=10)
+
+        self.content_frame = customtkinter.CTkFrame(self)
+        self.content_frame.pack(side="left", fill="both", expand=True)
+
+        self.hlavni_frame = customtkinter.CTkFrame(self.content_frame)
+        self.about_frame = customtkinter.CTkFrame(self.content_frame)
+        self.create_hlavni_content()
+        self.create_about_content()
+        self.show_hlavni()
 
 print("==================")
 print("")
@@ -289,3 +349,4 @@ print("==================")
 
 app = App()
 app.mainloop()
+
