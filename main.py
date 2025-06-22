@@ -24,13 +24,11 @@ muzesSpustit = False
 def button_callback():
     print("button pressed")
 
-def placeError(x,y):
-    app.error.place(x=x,y=y)
     
 def spustitBrowser():
     global jmeno, heslo, muzesSpustit, prohlizec
     if muzesSpustit == False:
-        placeError(70,250)
+        app.error.place(x=70,y=250)
         print("Nejprve zadej jméno a heslo!")
         
     else:
@@ -65,14 +63,22 @@ def spustitBrowser():
 def run_browser_thread():
     threading.Thread(target=spustitBrowser, daemon=True).start()
 
+class MyTabView(customtkinter.CTkTabview):
+    def __init__(self, master, **kwargs):
+        super().__init__(master, **kwargs)
 
+        # create tabs
+        self.add("tab 1")
+        self.add("tab 2")
 
+        # add widgets on tabs
+        self.label = customtkinter.CTkLabel(master=self.tab("tab 1"))
+        
 class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
         global jmeno, heslo, prohlizec, check_firefox
         customtkinter.set_appearance_mode("system")
-        self.configure(fg_color="#252527")
         self.title("ZAVploit")
         self.geometry("800x400")
         self.resizable(width= False, height = False)
@@ -80,18 +86,16 @@ class App(customtkinter.CTk):
         self.grid_rowconfigure(0, weight=1)
         self.iconbitmap('icon.ico')
         
-        self.button = customtkinter.CTkButton(
-            self,
-            text="Spustit ZAVploit",
-            font=("Sergoe UI", 50),
-            fg_color="#1CABB2",
-            corner_radius=20,
-            width=500,
-            height=80,
-            text_color="white",
-            command=run_browser_thread,
-            hover_color="#116970"
-        ).grid(row=1, column=0, padx=10, pady=10, sticky="ew")
+        customtkinter.set_default_color_theme("zav.json")
+        
+        # --- TABVIEW ---
+        self.tabview = customtkinter.CTkTabview(self, width=800, height=400)
+        self.tabview.pack(expand=True, fill="both")
+
+        self.tabview.add("Hlavní")
+        self.tabview.add("O aplikaci")
+        
+        hlavni = self.tabview.tab("Hlavní")
         
         def clicked():
             global jmeno, heslo, muzesSpustit
@@ -112,9 +116,9 @@ class App(customtkinter.CTk):
                 muzesSpustit = False
                 
             if heslo and jmeno !="":
-                placeError(690,4200)
+                app.error.place(x=690,y=1547)
             else:
-                placeError(70,250)
+                app.error.place(x=70,y=250)
         
         jmenoText = customtkinter.CTkLabel(self,text="Jméno",text_color="white", font=("Sergoe UI", 30)).place(x=20 , y=20)
         
@@ -142,13 +146,13 @@ class App(customtkinter.CTk):
         ulozitUdajeBTN = customtkinter.CTkButton(
             self,
             text="Dočasně uložit",
-            font=("Sergoe UI", 40),
-            fg_color="#1CABB2",
+            font=("", 40),
+            #fg_color="#1CABB2",
             corner_radius=50,
             width=300,
             text_color="white",
             command=clicked,
-            hover_color="#116970",
+            #hover_color="#116970",
         ).place(x=20,y=180)
         
         label = customtkinter.CTkLabel(self, text=("Vyber prohlížeč:"), font=("Sergoe UI", 30),text_color="white", fg_color="transparent").place(x=400,y=10)
@@ -190,11 +194,11 @@ class App(customtkinter.CTk):
                                                     text="Firefox",
                                                     font=("Sergoe UI", 30),
                                                     text_color="white",
-                                                    hover_color="#1CABB2",
+                                                    #hover_color="#1CABB2",
                                                     variable=check_firefox,
                                                     onvalue="on",
                                                     offvalue="off",
-                                                    fg_color="#1CABB2",
+                                                    #fg_color="#1CABB2",
                                                     command=checkbox_event)
         self.checkbox_firefox.place(x=400,y=50)
         
@@ -204,17 +208,34 @@ class App(customtkinter.CTk):
                                                     text="Chrome",
                                                     font=("Sergoe UI", 30),
                                                     text_color="white",
-                                                    hover_color="#1CABB2",
+                                                    #hover_color="#1CABB2",
                                                     variable=check_chrome,
                                                     onvalue="on",
                                                     offvalue="off",
-                                                    fg_color="#1CABB2",
+                                                    #fg_color="#1CABB2",
                                                     command=checkbox_event2)
         self.checkbox_chrome.place(x=400,y=90)
         
         
         self.error = customtkinter.CTkLabel(self, text="Nejprve zadej jméno a heslo!", text_color="red", font=("Courier New", 40, "bold"))
         
+        self.button = customtkinter.CTkButton(
+            self,
+            text="Spustit ZAVploit",
+            font=("Sergoe UI", 50),
+            #fg_color="#1CABB2",
+            corner_radius=20,
+            width=500,
+            height=80,
+            text_color="white",
+            command=run_browser_thread,
+            #hover_color="#116970"
+        )
+        self.button.pack(padx=10, pady=10, fill="x")
+        
+        about = self.tabview.tab("O aplikaci")
+        about_label = customtkinter.CTkLabel(about, text="ZAVploit\nAutor: Rodrick\n2025", font=("Sergoe UI", 30), text_color="white")
+        about_label.pack(pady=50)
         
         
 
@@ -226,3 +247,4 @@ print("==================")
 
 app = App()
 app.mainloop()
+
