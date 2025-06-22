@@ -78,7 +78,6 @@ class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
         global jmeno, heslo, prohlizec, check_firefox
-        customtkinter.set_appearance_mode("system")
         self.title("ZAVploit")
         self.geometry("800x400")
         self.resizable(width= False, height = False)
@@ -120,7 +119,10 @@ class App(customtkinter.CTk):
             else:
                 app.error.place(x=70,y=250)
         
-        jmenoText = customtkinter.CTkLabel(self,text="Jméno",text_color="white", font=("Sergoe UI", 30)).place(x=20 , y=20)
+        jmenoText = customtkinter.CTkLabel(self,
+                                           text="Jméno",
+                                           font=("Sergoe UI", 30))
+        jmenoText.place(x=20 , y=20)
         
         
         jmenoentry = customtkinter.CTkEntry(self,
@@ -153,9 +155,14 @@ class App(customtkinter.CTk):
             text_color="white",
             command=clicked,
             #hover_color="#116970",
-        ).place(x=20,y=180)
+        )
+        ulozitUdajeBTN.place(x=20,y=180)
         
-        label = customtkinter.CTkLabel(self, text=("Vyber prohlížeč:"), font=("Sergoe UI", 30),text_color="white", fg_color="transparent").place(x=400,y=10)
+        label = customtkinter.CTkLabel(self,
+                                       text=("Vyber prohlížeč:"),
+                                       font=("Sergoe UI", 30),
+                                       text_color="white")
+        label.place(x=400,y=40)
         
         
         def checkbox_event2():
@@ -200,7 +207,7 @@ class App(customtkinter.CTk):
                                                     offvalue="off",
                                                     #fg_color="#1CABB2",
                                                     command=checkbox_event)
-        self.checkbox_firefox.place(x=400,y=50)
+        self.checkbox_firefox.place(x=400,y=80)
         
                 
         check_chrome = customtkinter.StringVar(value="off")
@@ -214,7 +221,7 @@ class App(customtkinter.CTk):
                                                     offvalue="off",
                                                     #fg_color="#1CABB2",
                                                     command=checkbox_event2)
-        self.checkbox_chrome.place(x=400,y=90)
+        self.checkbox_chrome.place(x=400,y=130)
         
         
         self.error = customtkinter.CTkLabel(self, text="Nejprve zadej jméno a heslo!", text_color="red", font=("Courier New", 40, "bold"))
