@@ -9,6 +9,7 @@ import threading
 import os
 from PIL import Image
 
+
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
@@ -21,14 +22,11 @@ heslo = None
 prohlizec = "firefox"
 muzesSpustit = False
 
-def button_callback():
-    print("button pressed")
-
-    
+# Funkce ktera spusti prohlizec---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def spustitBrowser():
     global jmeno, heslo, muzesSpustit, prohlizec
     if muzesSpustit == False:
-        app.error.place(x=60,y=260)
+        app.error.place(x=40,y=260)
         print("Nejprve zadej jméno a heslo!")
         
     else:
@@ -59,20 +57,25 @@ def spustitBrowser():
             print("Hotovo!")
             input("Pro exitnutí s browseru zde odentruj: ")
             browser.close()
-        
+ 
 def run_browser_thread():
     threading.Thread(target=spustitBrowser, daemon=True).start()
+# Funkce ktera spusti prohlizec---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+
+# Funkce na meneni themu---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def changethemezav():
     print("zavtheme")
-    customtkinter.set_default_color_theme("themes\zav.json")
+    customtkinter.set_default_color_theme(r"themes\zav.json")
     app.recreate_content()  # přidejte tuto metodu do třídy App
 
 def changethemebreeze():
     print("breezetheme")
-    customtkinter.set_default_color_theme("themes\breeze.json")
+    customtkinter.set_default_color_theme(r"themes\breeze.json")
     app.recreate_content()  # přidejte tuto metodu do třídy App
-            
+# Funkce na meneni themu---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Samotný GUI---------------------------------------------------------------------------------------------------------------------------------------------------------------------------    
 class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
@@ -109,6 +112,7 @@ class App(customtkinter.CTk):
             self.menu_frame,
             text="",
             image=self.logo_icon,
+            fg_color="transparent",
             width=80,
             height=80)
         self.icon_logo.pack(pady=(0,20),padx=10)
@@ -161,14 +165,14 @@ class App(customtkinter.CTk):
             jmeno = jmenoentry.get()
             heslo = hesloentry.get()
             if jmeno != "":
-                print("Jméno a heslo bylo uloženo!")
+                print("Jméno bylo uloženo!")
                 muzesSpustit = True
             else:
                 print("Není zadané jméno")
                 muzesSpustit = False
             
             if heslo != "":
-                print("Jméno a heslo bylo uloženo!")
+                print("Heslo bylo uloženo!")
                 muzesSpustit = True
             else:
                 print("Není zadané heslo")
@@ -177,7 +181,7 @@ class App(customtkinter.CTk):
             if heslo and jmeno !="":
                 self.error.place_forget()
             else:
-                self.error.place(x=60,y=260)
+                self.error.place(x=40,y=260)
 
         jmenoText = customtkinter.CTkLabel(hlavni,
                                            text="Jméno",
@@ -290,7 +294,7 @@ class App(customtkinter.CTk):
         about_label = customtkinter.CTkLabel(about, text="ZAVploit\nAutor: Rodrick\n2025", font=("Sergoe UI", 30), text_color="white")
         about_label.pack(pady=50)
             
-        self.zavbtn = customtkinter.CTkButton(about, text="ZAV theme", command=changethemezav,font=("Segoe UI", 30))
+        self.zavbtn = customtkinter.CTkButton(about, text="Z*V theme", command=changethemezav,font=("Segoe UI", 30))
         self.zavbtn.place(x=200,y=200)
         
         self.zavbtn = customtkinter.CTkButton(about, text="Breeze theme", command=changethemebreeze,font=("Segoe UI", 30))
@@ -308,6 +312,7 @@ class App(customtkinter.CTk):
             self.menu_frame,
             text="",
             image=self.logo_icon,
+            fg_color="transparent",
             width=80,
             height=80)
         self.icon_logo.pack(pady=(0,20),padx=10)
@@ -340,6 +345,8 @@ class App(customtkinter.CTk):
         self.create_hlavni_content()
         self.create_about_content()
         self.show_hlavni()
+# Samotný GUI---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 print("==================")
 print("")
@@ -349,4 +356,3 @@ print("==================")
 
 app = App()
 app.mainloop()
-
