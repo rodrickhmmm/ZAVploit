@@ -8,7 +8,7 @@ import customtkinter
 import threading
 import os
 from PIL import Image
-
+import queue
 
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -21,14 +21,20 @@ jmeno = None
 heslo = None
 prohlizec = "firefox"
 muzesSpustit = False
+moznost = "Z*V theme"
+browser = None
+context = None
+page = None
+command_queue = queue.Queue()
 
 # Funkce ktera spusti prohlizec---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def spustitBrowser():
     global jmeno, heslo, muzesSpustit, prohlizec
+    global browser, context, page
+
     if muzesSpustit == False:
-        app.error.place(x=40,y=260)
+        app.error.place(x=40, y=260)
         print("Nejprve zadej jméno a heslo!")
-        
     else:
         with sync_playwright() as p:
             clear()
@@ -38,10 +44,10 @@ def spustitBrowser():
                 browser = p.firefox.launch(headless=False)
             else:
                 browser = p.chromium.launch(headless=False)
-            print("Program se spouští v rozlišení:", sirka,"x",vyska)
+            print("Program se spouští v rozlišení:", sirka, "x", vyska)
             context = browser.new_context(
                 viewport={"width": sirka, "height": vyska}
-            ) 
+            )
             page = context.new_page()
             print("Program otevírá ZAV stránku...")
             page.goto("https://student.zav.cz/#!/login")
@@ -55,25 +61,67 @@ def spustitBrowser():
             print("Přihlášen, teď dává exploit...")
             page.evaluate("document.documentElement.setAttribute('contenteditable', 'true');")
             print("Hotovo!")
-            input("Pro exitnutí s browseru zde odentruj: ")
+
+            # Main loop to process commands from the queue
+            while True:
+                try:
+                    cmd = command_queue.get(timeout=0.5)
+                    if cmd == "activate_exploit":
+                        page.evaluate("document.documentElement.setAttribute('contenteditable', 'true');")
+                        print("Exploit je znovu aktivován")
+                    elif cmd == "close_browser":
+                        print("Zavírám browser...")
+                        browser.close()
+                        break
+                except queue.Empty:
+                    continue
+
             browser.close()
  
 def run_browser_thread():
     threading.Thread(target=spustitBrowser, daemon=True).start()
+    
+def make_page_exploited():
+    if page is not None:
+        command_queue.put("activate_exploit")
+    else:
+        print("Prohlížeč není spuštěn nebo stránka není dostupná.")
+        
+def close_browser():
+    if page is not None:
+        command_queue.put("close_browser")
+    else:
+        print("Prohlížeč není spuštěn nebo stránka není dostupná.")
+    
+        
 # Funkce ktera spusti prohlizec---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 
 # Funkce na meneni themu---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def changethemezav():
+    global moznost
     print("zavtheme")
     customtkinter.set_default_color_theme(r"themes\zav.json")
+    moznost = "Z*V theme"
     app.recreate_content()  # přidejte tuto metodu do třídy App
 
 def changethemebreeze():
+    global moznost
     print("breezetheme")
     customtkinter.set_default_color_theme(r"themes\breeze.json")
+    moznost = "Breeze theme"
     app.recreate_content()  # přidejte tuto metodu do třídy App
+
+def changethememidnight():
+    global moznost
+    print("midnighttheme")
+    customtkinter.set_default_color_theme(r"themes\midnight.json")
+    moznost = "Midnight theme"
+    app.recreate_content()  # přidejte tuto metodu do třídy App
+    
 # Funkce na meneni themu---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 # Samotný GUI---------------------------------------------------------------------------------------------------------------------------------------------------------------------------    
 class App(customtkinter.CTk):
@@ -85,8 +133,7 @@ class App(customtkinter.CTk):
         self.resizable(width=False, height=False)
         self.iconbitmap('ikonky\icon.ico')
         customtkinter.set_default_color_theme("themes\zav.json")
-        #self.configure(bg="#242424")
-
+        
         # --- NAČTENÍ IKON ---
         self.home_icon = customtkinter.CTkImage(
             light_image=Image.open("ikonky\home_icon.png"),
@@ -127,38 +174,42 @@ class App(customtkinter.CTk):
         )
         self.btn_hlavni.pack(pady=(0,40), padx=10)
 
-        self.btn_about = customtkinter.CTkButton(
+        self.btn_nastaveni = customtkinter.CTkButton(
             self.menu_frame,
             text="",  # bez textu, jen ikona
             image=self.settings_icon,
             width=70,
             height=70,
-            command=self.show_about
+            command=self.show_nastaveni
         )
-        self.btn_about.pack(pady=0, padx=10)
+        self.btn_nastaveni.pack(pady=0, padx=10)
 
         # --- OBSAHOVÉ FRAMY ---
         self.content_frame = customtkinter.CTkFrame(self)
         self.content_frame.pack(side="left", fill="both", expand=True)
 
         self.hlavni_frame = customtkinter.CTkFrame(self.content_frame)
-        self.about_frame = customtkinter.CTkFrame(self.content_frame)
+        self.nastaveni_frame = customtkinter.CTkFrame(self.content_frame)
 
         self.create_hlavni_content()
-        self.create_about_content()
+        self.create_nastaveni_content()
 
         self.show_hlavni()  # výchozí zobrazení
 
     def show_hlavni(self):
-        self.about_frame.pack_forget()
+        self.nastaveni_frame.pack_forget()
         self.hlavni_frame.pack(fill="both", expand=True)
 
-    def show_about(self):
+    def show_nastaveni(self):
         self.hlavni_frame.pack_forget()
-        self.about_frame.pack(fill="both", expand=True)
+        self.nastaveni_frame.pack(fill="both", expand=True)
 
     def create_hlavni_content(self):
         hlavni = self.hlavni_frame
+
+        # --- LOGIN FRAME ---
+        self.login_frame = customtkinter.CTkFrame(hlavni, width=350, height=280, corner_radius=20)
+        self.login_frame.place(x=10, y=10)
 
         def clicked():
             global jmeno, heslo, muzesSpustit
@@ -183,33 +234,33 @@ class App(customtkinter.CTk):
             else:
                 self.error.place(x=40,y=260)
 
-        jmenoText = customtkinter.CTkLabel(hlavni,
+        jmenoText = customtkinter.CTkLabel(self.login_frame,
                                            text="Jméno",
                                            font=("Sergoe UI", 30))
         jmenoText.place(x=20 , y=20)
         
-        jmenoentry = customtkinter.CTkEntry(hlavni,
+        jmenoentry = customtkinter.CTkEntry(self.login_frame,
                                             placeholder_text="Zadej jméno",
                                             width=300,
                                             height=40,
                                             font=("Sergoe UI", 20)
         )
-        jmenoentry.place(x=20, y=50)
+        jmenoentry.place(x=20, y=60)
         
-        hesloText = customtkinter.CTkLabel(hlavni, text="Heslo", font=("Sergoe UI", 30))
-        hesloText.place(x=20 , y=97)
+        hesloText = customtkinter.CTkLabel(self.login_frame, text="Heslo", font=("Sergoe UI", 30))
+        hesloText.place(x=20 , y=110)
         
-        hesloentry = customtkinter.CTkEntry(hlavni,
+        hesloentry = customtkinter.CTkEntry(self.login_frame,
                                             placeholder_text="Zadej heslo",
                                             width=300,
                                             height=40,
                                             font=("Sergoe UI", 20),
                                             show="*"
         )
-        hesloentry.place(x=20, y=130)
+        hesloentry.place(x=20, y=150)
         
         ulozitUdajeBTN = customtkinter.CTkButton(
-            hlavni,
+            self.login_frame,
             text="Dočasně uložit",
             font=("", 40),
             corner_radius=50,
@@ -217,13 +268,17 @@ class App(customtkinter.CTk):
             text_color="white",
             command=clicked,
         )
-        ulozitUdajeBTN.place(x=20,y=180)
-        
-        label = customtkinter.CTkLabel(hlavni,
+        ulozitUdajeBTN.place(x=20,y=200)
+
+        # --- BROWSER FRAME (pro checkboxy) ---
+        self.browser_frame = customtkinter.CTkFrame(hlavni, width=270, height=190, corner_radius=20)
+        self.browser_frame.place(x=370, y=10)
+
+        label = customtkinter.CTkLabel(self.browser_frame,
                                        text=("Vyber prohlížeč:"),
                                        font=("Sergoe UI", 30),
                                        text_color="white")
-        label.place(x=400,y=40)
+        label.place(x=20, y=20)
         
         def checkbox_event2():
             global anoNe2
@@ -255,7 +310,7 @@ class App(customtkinter.CTk):
                 self.checkbox_chrome.select()
 
         check_firefox = customtkinter.StringVar(value="on")
-        self.checkbox_firefox = customtkinter.CTkCheckBox(hlavni,
+        self.checkbox_firefox = customtkinter.CTkCheckBox(self.browser_frame,
                                                     text="Firefox",
                                                     font=("Sergoe UI", 30),
                                                     text_color="white",
@@ -263,10 +318,10 @@ class App(customtkinter.CTk):
                                                     onvalue="on",
                                                     offvalue="off",
                                                     command=checkbox_event)
-        self.checkbox_firefox.place(x=400,y=80)
+        self.checkbox_firefox.place(x=20, y=70)
         
         check_chrome = customtkinter.StringVar(value="off")
-        self.checkbox_chrome = customtkinter.CTkCheckBox(hlavni,
+        self.checkbox_chrome = customtkinter.CTkCheckBox(self.browser_frame,
                                                     text="Chrome",
                                                     font=("Sergoe UI", 30),
                                                     text_color="white",
@@ -274,7 +329,7 @@ class App(customtkinter.CTk):
                                                     onvalue="on",
                                                     offvalue="off",
                                                     command=checkbox_event2)
-        self.checkbox_chrome.place(x=400,y=130)
+        self.checkbox_chrome.place(x=20, y=125)
         
         self.error = customtkinter.CTkLabel(hlavni, text="Nejprve zadej jméno a heslo!", text_color="red", font=("Courier New", 35, "bold"))
         
@@ -289,16 +344,59 @@ class App(customtkinter.CTk):
         )
         self.button.pack(side="bottom", fill="x", padx=20, pady=20)
 
-    def create_about_content(self):
-        about = self.about_frame
-        about_label = customtkinter.CTkLabel(about, text="ZAVploit\nAutor: Rodrick\n2025", font=("Sergoe UI", 30), text_color="white")
-        about_label.pack(pady=50)
-            
-        self.zavbtn = customtkinter.CTkButton(about, text="Z*V theme", command=changethemezav,font=("Segoe UI", 30))
-        self.zavbtn.place(x=200,y=200)
+    def create_nastaveni_content(self):
+        global moznost
         
-        self.zavbtn = customtkinter.CTkButton(about, text="Breeze theme", command=changethemebreeze,font=("Segoe UI", 30))
-        self.zavbtn.place(x=200,y=250)
+        nastaveni = self.nastaveni_frame
+        nastaveni_label = customtkinter.CTkLabel(nastaveni, text="ZAVploit @2025 n/ hmmm", font=("Sergoe UI", 10), text_color="white")
+        nastaveni_label.pack(side="right", padx=(0,10), pady=(370,0))
+    
+        
+        vyberthemetext = customtkinter.CTkLabel(nastaveni, text="Vyber theme:", font=("Segoe UI", 30))
+        vyberthemetext.place(x=30,y=20)
+        def optionmenu_callback(choice):
+            global moznost
+            print("optionmenu dropdown clicked:", choice)
+            
+            if choice == "Z*V theme":
+                changethemezav()
+                
+            elif choice == "Breeze theme":
+                changethemebreeze()
+                
+            elif choice == "Midnight theme":
+                changethememidnight()
+            
+                
+        optionmenu_var = customtkinter.StringVar(value=moznost)
+        self.optionmenu = customtkinter.CTkOptionMenu(nastaveni,values=["Z*V theme", "Breeze theme", "Midnight theme"],
+                                                 command=optionmenu_callback,
+                                                 variable=optionmenu_var,
+                                                 font=("Segoe UI", 25),
+                                                 width=200,
+                                                 height=40)
+        self.optionmenu.place(x=30,y=70)
+        
+        self.button = customtkinter.CTkButton(
+            nastaveni,
+            text="Zaktivuj znovu exploit",
+            font=("Sergoe UI", 27),
+            height=45,
+            text_color="white",
+            command=make_page_exploited,
+        )
+        self.button.place(x=340,y=70)
+        
+        self.button = customtkinter.CTkButton(
+            nastaveni,
+            text="Vypnout browser",
+            font=("Sergoe UI", 27),
+            height=45,
+            text_color="white",
+            command=close_browser,
+        )
+        self.button.place(x=340,y=130)
+        
         
     def recreate_content(self):
         # Zničit staré framy včetně menu_frame
@@ -327,23 +425,23 @@ class App(customtkinter.CTk):
         )
         self.btn_hlavni.pack(pady=(0,40), padx=10)
 
-        self.btn_about = customtkinter.CTkButton(
+        self.btn_nastaveni = customtkinter.CTkButton(
             self.menu_frame,
             text="",
             image=self.settings_icon,
             width=70,
             height=70,
-            command=self.show_about
+            command=self.show_nastaveni
         )
-        self.btn_about.pack(pady=0, padx=10)
+        self.btn_nastaveni.pack(pady=0, padx=10)
 
         self.content_frame = customtkinter.CTkFrame(self)
         self.content_frame.pack(side="left", fill="both", expand=True)
 
         self.hlavni_frame = customtkinter.CTkFrame(self.content_frame)
-        self.about_frame = customtkinter.CTkFrame(self.content_frame)
+        self.nastaveni_frame = customtkinter.CTkFrame(self.content_frame)
         self.create_hlavni_content()
-        self.create_about_content()
+        self.create_nastaveni_content()
         self.show_hlavni()
 # Samotný GUI---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
