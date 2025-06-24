@@ -26,6 +26,7 @@ browser = None
 context = None
 page = None
 command_queue = queue.Queue()
+kliknuto = 0
 
 # Funkce ktera spusti prohlizec---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def spustitBrowser():
@@ -93,7 +94,24 @@ def close_browser():
     else:
         print("Prohlížeč není spuštěn nebo stránka není dostupná.")
     
-        
+def eastereggvideo():
+    with sync_playwright() as p:
+        browser = p.firefox.launch(headless=False)
+        context = browser.new_context(
+            viewport={"width": sirka, "height": vyska}
+        )
+        page = context.new_page()
+        page.goto("https://packaged-media.redd.it/gq3bpywa60cb1/pb/m2-res_720p.mp4?m=DASHPlaylist.mpd&v=1&e=1750798800&s=0e156566946e5c307a649bcad3ead5d924003892")
+        time.sleep(10000)
+        browser.close()
+def easteregg():
+    global kliknuto
+    kliknuto += 1
+    print(kliknuto)
+    if kliknuto == 20:
+        threading.Thread(target=eastereggvideo, daemon=True).start()
+        time.sleep(15)
+        exit()
 # Funkce ktera spusti prohlizec---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -105,6 +123,7 @@ def changethemezav():
     customtkinter.set_default_color_theme(r"themes\zav.json")
     moznost = "Z*V theme"
     app.recreate_content()  # přidejte tuto metodu do třídy App
+    clear()
 
 def changethemebreeze():
     global moznost
@@ -112,6 +131,7 @@ def changethemebreeze():
     customtkinter.set_default_color_theme(r"themes\breeze.json")
     moznost = "Breeze theme"
     app.recreate_content()  # přidejte tuto metodu do třídy App
+    clear()
 
 def changethememidnight():
     global moznost
@@ -119,6 +139,7 @@ def changethememidnight():
     customtkinter.set_default_color_theme(r"themes\midnight.json")
     moznost = "Midnight theme"
     app.recreate_content()  # přidejte tuto metodu do třídy App
+    clear()
     
 # Funkce na meneni themu---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -318,7 +339,7 @@ class App(customtkinter.CTk):
                                                     onvalue="on",
                                                     offvalue="off",
                                                     command=checkbox_event)
-        self.checkbox_firefox.place(x=20, y=70)
+        self.checkbox_firefox.place(x=20, y=62)
         
         check_chrome = customtkinter.StringVar(value="off")
         self.checkbox_chrome = customtkinter.CTkCheckBox(self.browser_frame,
@@ -329,7 +350,7 @@ class App(customtkinter.CTk):
                                                     onvalue="on",
                                                     offvalue="off",
                                                     command=checkbox_event2)
-        self.checkbox_chrome.place(x=20, y=125)
+        self.checkbox_chrome.place(x=20, y=112)
         
         self.error = customtkinter.CTkLabel(hlavni, text="Nejprve zadej jméno a heslo!", text_color="red", font=("Courier New", 35, "bold"))
         
@@ -348,7 +369,7 @@ class App(customtkinter.CTk):
         global moznost
         
         nastaveni = self.nastaveni_frame
-        nastaveni_label = customtkinter.CTkLabel(nastaveni, text="ZAVploit @2025 n/ hmmm", font=("Sergoe UI", 10), text_color="white")
+        nastaveni_label = customtkinter.CTkLabel(nastaveni, text="ZAVploit 1.0 Beta \n Rodirck/Rodra_ @2025", font=("Callibri", 10, "italic"), text_color="white")
         nastaveni_label.pack(side="right", padx=(0,10), pady=(370,0))
     
         
@@ -396,6 +417,17 @@ class App(customtkinter.CTk):
             command=close_browser,
         )
         self.button.place(x=340,y=130)
+
+        self.button = customtkinter.CTkButton(
+            nastaveni,
+            text="Zahadny tlacitko",
+            font=("Sergoe UI", 10),
+            fg_color="transparent",
+            text_color="grey15",
+            width=100,
+            command=easteregg,
+        )
+        self.button.place(x=0,y=370)
         
         
     def recreate_content(self):
