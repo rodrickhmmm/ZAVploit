@@ -379,7 +379,7 @@ class App(customtkinter.CTk):
         nastaveni_label = customtkinter.CTkLabel(nastaveni, text="ZAVploit 1.0 Beta \n Rodirck/Rodra_ @2025", font=("Callibri", 10, "italic"), text_color="white")
         nastaveni_label.pack(side="right", padx=(0,10), pady=(370,0))
         
-        self.theme_frame = customtkinter.CTkFrame(nastaveni, width=300, height=280, corner_radius=20)
+        self.theme_frame = customtkinter.CTkFrame(nastaveni, width=300, height=290, corner_radius=20)
         self.theme_frame.place(x=10, y=10)
         
         vyberthemetext = customtkinter.CTkLabel(self.theme_frame, text="Nastavení aplikace", font=("Segoe UI", 30)).place(x=30,y=30)
@@ -404,11 +404,16 @@ class App(customtkinter.CTk):
                                                  font=("Segoe UI", 25),
                                                  width=200,
                                                  height=40).place(x=30,y=140)
+        switch_var = customtkinter.StringVar(value="on")
+        self.switch = customtkinter.CTkSwitch(self.theme_frame, text="Automat. přihlásit", font=("Segoe UI", 25) , command=0,
+                                 variable=switch_var, onvalue="on", offvalue="off")
+        self.switch.place(x=30,y=220)
         
-        self.browser_options_frame = customtkinter.CTkFrame(nastaveni, width=320, height=280, corner_radius=20)
-        self.browser_options_frame.place(x=320, y=10)
+        self.browser_options_frame = customtkinter.CTkFrame(nastaveni, width=325, height=240, corner_radius=20)
+        self.browser_options_frame.place(x=325, y=10)
         
-        vyberthemetext = customtkinter.CTkLabel(self.browser_options_frame, text="Nastavení exploitu", font=("Segoe UI", 30)).place(x=20,y=30)
+        
+        exploitnastavenitext = customtkinter.CTkLabel(self.browser_options_frame, text="Nastavení exploitu", font=("Segoe UI", 30)).place(x=20,y=30)
         
         self.button = customtkinter.CTkButton(
             self.browser_options_frame,
@@ -422,7 +427,7 @@ class App(customtkinter.CTk):
         
         self.button = customtkinter.CTkButton(
             self.browser_options_frame,
-            text="Vypnout browser",
+            text="Vypni prohlížeč",
             font=("Sergoe UI", 27),
             height=45,
             text_color="white",
