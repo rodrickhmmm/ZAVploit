@@ -9,6 +9,7 @@ import threading
 import os
 from PIL import Image
 import queue
+from notifypy import Notify
 
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -27,6 +28,7 @@ context = None
 page = None
 command_queue = queue.Queue()
 kliknuto = 0
+notification = Notify()
 
 # Funkce ktera spusti prohlizec---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def spustitBrowser():
@@ -62,6 +64,10 @@ def spustitBrowser():
             print("Přihlášen, teď dává exploit...")
             page.evaluate("document.documentElement.setAttribute('contenteditable', 'true');")
             print("Hotovo!")
+            notification.title = "ZAVploit"
+            notification.message = "Prohlížeč s exploitem načten!"
+            notification.icon = "ikonky\logo.png"
+            notification.send()
 
             # Main loop to process commands from the queue
             while True:
@@ -364,17 +370,20 @@ class App(customtkinter.CTk):
             command=run_browser_thread,
         )
         self.button.pack(side="bottom", fill="x", padx=20, pady=20)
-
+        
+        
     def create_nastaveni_content(self):
         global moznost
         
         nastaveni = self.nastaveni_frame
         nastaveni_label = customtkinter.CTkLabel(nastaveni, text="ZAVploit 1.0 Beta \n Rodirck/Rodra_ @2025", font=("Callibri", 10, "italic"), text_color="white")
         nastaveni_label.pack(side="right", padx=(0,10), pady=(370,0))
-    
         
-        vyberthemetext = customtkinter.CTkLabel(nastaveni, text="Vyber theme:", font=("Segoe UI", 30))
-        vyberthemetext.place(x=30,y=20)
+        self.theme_frame = customtkinter.CTkFrame(nastaveni, width=300, height=280, corner_radius=20)
+        self.theme_frame.place(x=10, y=10)
+        
+        vyberthemetext = customtkinter.CTkLabel(self.theme_frame, text="Nastavení aplikace", font=("Segoe UI", 30)).place(x=30,y=30)
+        vyberthemetext = customtkinter.CTkLabel(self.theme_frame, text="Vyber theme:", font=("Segoe UI", 30)).place(x=30,y=90)
         def optionmenu_callback(choice):
             global moznost
             print("optionmenu dropdown clicked:", choice)
@@ -387,36 +396,39 @@ class App(customtkinter.CTk):
                 
             elif choice == "Midnight theme":
                 changethememidnight()
-            
-                
+        
         optionmenu_var = customtkinter.StringVar(value=moznost)
-        self.optionmenu = customtkinter.CTkOptionMenu(nastaveni,values=["Z*V theme", "Breeze theme", "Midnight theme"],
+        self.optionmenu = customtkinter.CTkOptionMenu(self.theme_frame,values=["Z*V theme", "Breeze theme", "Midnight theme"],
                                                  command=optionmenu_callback,
                                                  variable=optionmenu_var,
                                                  font=("Segoe UI", 25),
                                                  width=200,
-                                                 height=40)
-        self.optionmenu.place(x=30,y=70)
+                                                 height=40).place(x=30,y=140)
+        
+        self.browser_options_frame = customtkinter.CTkFrame(nastaveni, width=320, height=280, corner_radius=20)
+        self.browser_options_frame.place(x=320, y=10)
+        
+        vyberthemetext = customtkinter.CTkLabel(self.browser_options_frame, text="Nastavení exploitu", font=("Segoe UI", 30)).place(x=20,y=30)
         
         self.button = customtkinter.CTkButton(
-            nastaveni,
+            self.browser_options_frame,
             text="Zaktivuj znovu exploit",
             font=("Sergoe UI", 27),
             height=45,
             text_color="white",
             command=make_page_exploited,
         )
-        self.button.place(x=340,y=70)
+        self.button.place(x=20,y=90)
         
         self.button = customtkinter.CTkButton(
-            nastaveni,
+            self.browser_options_frame,
             text="Vypnout browser",
             font=("Sergoe UI", 27),
             height=45,
             text_color="white",
             command=close_browser,
         )
-        self.button.place(x=340,y=130)
+        self.button.place(x=20,y=150)
 
         self.button = customtkinter.CTkButton(
             nastaveni,
