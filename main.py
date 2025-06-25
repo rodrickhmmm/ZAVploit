@@ -36,7 +36,7 @@ def spustitBrowser():
     global browser, context, page
 
     if muzesSpustit == False:
-        app.error.place(x=40, y=260)
+        pyautogui.alert("Nejprve zadej jméno a heslo!",title="Error")
         print("Nejprve zadej jméno a heslo!")
     else:
         with sync_playwright() as p:
@@ -257,9 +257,9 @@ class App(customtkinter.CTk):
                 muzesSpustit = False
                 
             if heslo and jmeno !="":
-                self.error.place_forget()
+                0
             else:
-                self.error.place(x=40,y=260)
+                pyautogui.alert("Nejprve zadej jméno a heslo!",title="Error")
 
         jmenoText = customtkinter.CTkLabel(self.login_frame,
                                            text="Jméno",
@@ -358,8 +358,6 @@ class App(customtkinter.CTk):
                                                     command=checkbox_event2)
         self.checkbox_chrome.place(x=20, y=112)
         
-        self.error = customtkinter.CTkLabel(hlavni, text="Nejprve zadej jméno a heslo!", text_color="red", font=("Courier New", 35, "bold"))
-        
         self.button = customtkinter.CTkButton(
             hlavni,
             text="Spustit ZAVploit",
@@ -404,7 +402,7 @@ class App(customtkinter.CTk):
                                                  font=("Segoe UI", 25),
                                                  width=200,
                                                  height=40).place(x=30,y=140)
-        switch_var = customtkinter.StringVar(value="on")
+        switch_var = customtkinter.StringVar(value="off")
         self.switch = customtkinter.CTkSwitch(self.theme_frame, text="Automat. přihlásit", font=("Segoe UI", 25) , command=0,
                                  variable=switch_var, onvalue="on", offvalue="off")
         self.switch.place(x=30,y=220)
@@ -438,10 +436,11 @@ class App(customtkinter.CTk):
         self.button = customtkinter.CTkButton(
             nastaveni,
             text="Zahadny tlacitko",
-            font=("Sergoe UI", 10),
+            font=("Sergoe UI", 5),
             fg_color="transparent",
             text_color="grey15",
-            width=100,
+            width=20,
+            height=20,
             command=easteregg,
         )
         self.button.place(x=0,y=370)
@@ -494,7 +493,17 @@ class App(customtkinter.CTk):
         self.show_hlavni()
 # Samotný GUI---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
+print(r"""
+ ________   ______  __  __          ___               __      
+/\_____  \ /\  _  \/\ \/\ \        /\_ \           __/\ \__   
+\/____//'/'\ \ \L\ \ \ \ \ \  _____\//\ \     ___ /\_\ \ ,_\  
+     //'/'  \ \  __ \ \ \ \ \/\ '__`\\ \ \   / __`\/\ \ \ \/  
+    //'/'___ \ \ \/\ \ \ \_/ \ \ \L\ \\_\ \_/\ \L\ \ \ \ \ \_ 
+    /\_______\\ \_\ \_\ `\___/\ \ ,__//\____\ \____/\ \_\ \__\
+    \/_______/ \/_/\/_/`\/__/  \ \ \/ \/____/\/___/  \/_/\/__/
+                                \ \_\                         
+                                 \/_/                         
+""")
 print("==================")
 print("")
 print("ZAVploit konzole")
