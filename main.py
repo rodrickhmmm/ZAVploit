@@ -12,6 +12,18 @@ import queue
 from notifypy import Notify
 import json
 
+jmeno = None
+heslo = None
+prohlizec = "firefox"
+muzesSpustit = False
+moznost = "Z*V theme"
+browser = None
+context = None
+page = None
+command_queue = queue.Queue()
+kliknuto = 0
+notification = Notify()
+
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
     print("===============================================================")
@@ -33,17 +45,46 @@ for m in get_monitors():
     vyska = m.height
     sirka = m.width
 
-jmeno = None
-heslo = None
-prohlizec = "firefox"
-muzesSpustit = False
-moznost = "Z*V theme"
-browser = None
-context = None
-page = None
-command_queue = queue.Queue()
-kliknuto = 0
-notification = Notify()
+default_settings = {
+    "jmenoLogin": "default_value",
+    "hesloLogin": "default_value",
+    "autoPrihlasit": "off"
+}
+
+def ulozit_nastaveni():
+    global jmenoLogin, hesloLogin, autoPrihlasit
+    nastaveni = {
+        "jmenoLogin": jmenoLogin,
+        "hesloLogin": hesloLogin,
+        "autoPrihlasit": autoPrihlasit
+    }
+    with open("settings.json", "w", encoding="utf-8") as file:
+        json.dump(nastaveni, file, ensure_ascii=False, indent=4)
+
+# importuje nastavení
+def import1():
+    global jmenoLogin, hesloLogin, autoPrihlasit
+    if os.path.exists("settings.json"):
+        with open("settings.json", "r", encoding="utf-8") as file:
+            try:
+                nastaveni = json.load(file)
+                jmenoLogin = nastaveni.get("jmenoLogin", "default_value")
+                hesloLogin = nastaveni.get("hesloLogin", "default_value")
+                autoPrihlasit = nastaveni.get("autoPrihlasit", "off")
+            except json.JSONDecodeError:
+                input("Soubor settings.json je poškozen, vytvářím výchozí nastavení. Press enter to continue...")
+                with open("settings.json", "w", encoding="utf-8") as file:
+                    json.dump(default_settings, file, ensure_ascii=False, indent=4)
+                import1()
+    else:
+        input("Nastavení nebylo nalezeno, vytvářím výchozí nastavení. Press enter to continue...")
+        with open("settings.json", "w", encoding="utf-8") as file:
+            json.dump(default_settings, file, ensure_ascii=False, indent=4)
+        import1()
+        clear()
+
+
+import1()
 
 def Login():
     time.sleep(.1)
@@ -177,7 +218,7 @@ def changethememidnight():
 class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
-        global jmeno, heslo, prohlizec, check_firefox
+        global jmeno, heslo, prohlizec, check_firefox, jmenoLogin, hesloLogin, autoPrihlasit
         self.title("ZAVploit")
         self.geometry("800x400")
         self.resizable(width=False, height=False)
@@ -427,8 +468,22 @@ class App(customtkinter.CTk):
                                                  font=("Segoe UI", 25),
                                                  width=200,
                                                  height=40).place(x=30,y=140)
+        
+        def switch_event():
+            global jmenoLogin, hesloLogin, autoPrihlasit
+            onOff = switch_var.get()
+            if onOff == "on":
+                autoPrihlasit = "on"
+                ulozit_nastaveni()
+                print(autoPrihlasit)
+            else:
+                autoPrihlasit = "off"
+                ulozit_nastaveni()
+                print(autoPrihlasit)
+
+
         switch_var = customtkinter.StringVar(value="off")
-        self.switch = customtkinter.CTkSwitch(self.theme_frame, text="Automat. přihlásit", font=("Segoe UI", 25) , command=0,
+        self.switch = customtkinter.CTkSwitch(self.theme_frame, text="Automat. přihlásit", font=("Segoe UI", 25) , command=switch_event,
                                  variable=switch_var, onvalue="on", offvalue="off")
         self.switch.place(x=30,y=220)
         
