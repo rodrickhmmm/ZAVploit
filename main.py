@@ -13,6 +13,20 @@ from notifypy import Notify
 
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
+    print("===============================================================")
+    print(r"""
+ ________   ______  __  __          ___               __      
+/\_____  \ /\  _  \/\ \/\ \        /\_ \           __/\ \__   
+\/____//'/'\ \ \L\ \ \ \ \ \  _____\//\ \     ___ /\_\ \ ,_\  
+     //'/'  \ \  __ \ \ \ \ \/\ '__`\\ \ \   / __`\/\ \ \ \/  
+    //'/'___ \ \ \/\ \ \ \_/ \ \ \L\ \\_\ \_/\ \L\ \ \ \ \ \_ 
+    /\_______\\ \_\ \_\ `\___/\ \ ,__//\____\ \____/\ \_\ \__\
+    \/_______/ \/_/\/_/`\/__/  \ \ \/ \/____/\/___/  \/_/\/__/
+                                \ \_\                         
+                                 \/_/                         
+    """)
+    print("===============================================================")
+    print()
 
 for m in get_monitors():
     vyska = m.height
@@ -30,6 +44,14 @@ command_queue = queue.Queue()
 kliknuto = 0
 notification = Notify()
 
+def Login():
+    time.sleep(.1)
+    pyautogui.typewrite(jmeno, interval=0)
+    pyautogui.press("tab")
+    print("Zadává heslo...")
+    pyautogui.typewrite(heslo, interval=0)
+    pyautogui.press("enter")
+    
 # Funkce ktera spusti prohlizec---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def spustitBrowser():
     global jmeno, heslo, muzesSpustit, prohlizec
@@ -56,11 +78,7 @@ def spustitBrowser():
             page.goto("https://student.zav.cz/#!/login")
             print("Zadává jméno...")
             time.sleep(.1)
-            pyautogui.typewrite(jmeno, interval=0)
-            pyautogui.press("tab")
-            print("Zadává heslo...")
-            pyautogui.typewrite(heslo, interval=0)
-            pyautogui.press("enter")
+            Login()
             print("Přihlášen, teď dává exploit...")
             page.evaluate("document.documentElement.setAttribute('contenteditable', 'true');")
             print("Hotovo!")
@@ -91,6 +109,10 @@ def run_browser_thread():
 def make_page_exploited():
     if page is not None:
         command_queue.put("activate_exploit")
+        notification.title = "ZAVploit"
+        notification.message = "Do ZAVu byl znovu injectnut exploit!"
+        notification.icon = "ikonky\logo.png"
+        notification.send()
     else:
         print("Prohlížeč není spuštěn nebo stránka není dostupná.")
         
@@ -224,10 +246,12 @@ class App(customtkinter.CTk):
         self.show_hlavni()  # výchozí zobrazení
 
     def show_hlavni(self):
+        print("Hlavní stránka")
         self.nastaveni_frame.pack_forget()
         self.hlavni_frame.pack(fill="both", expand=True)
 
     def show_nastaveni(self):
+        print("Nastavení")
         self.hlavni_frame.pack_forget()
         self.nastaveni_frame.pack(fill="both", expand=True)
 
@@ -407,7 +431,7 @@ class App(customtkinter.CTk):
                                  variable=switch_var, onvalue="on", offvalue="off")
         self.switch.place(x=30,y=220)
         
-        self.browser_options_frame = customtkinter.CTkFrame(nastaveni, width=325, height=240, corner_radius=20)
+        self.browser_options_frame = customtkinter.CTkFrame(nastaveni, width=325, height=280, corner_radius=20)
         self.browser_options_frame.place(x=325, y=10)
         
         
@@ -423,6 +447,24 @@ class App(customtkinter.CTk):
         )
         self.button.place(x=20,y=90)
         
+        def Login2():
+            pyautogui.keyDown('alt')
+            time.sleep(.2)
+            pyautogui.press('tab')
+            time.sleep(.2)
+            pyautogui.keyUp('alt')
+            Login()
+            
+        self.button = customtkinter.CTkButton(
+            self.browser_options_frame,
+            text="Znovu přihlásit",
+            font=("Sergoe UI", 27),
+            height=45,
+            text_color="white",
+            command=Login2,
+        )
+        self.button.place(x=20,y=150)
+        
         self.button = customtkinter.CTkButton(
             self.browser_options_frame,
             text="Vypni prohlížeč",
@@ -431,7 +473,7 @@ class App(customtkinter.CTk):
             text_color="white",
             command=close_browser,
         )
-        self.button.place(x=20,y=150)
+        self.button.place(x=20,y=150+60)
 
         self.button = customtkinter.CTkButton(
             nastaveni,
@@ -493,6 +535,7 @@ class App(customtkinter.CTk):
         self.show_hlavni()
 # Samotný GUI---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+print("===============================================================")
 print(r"""
  ________   ______  __  __          ___               __      
 /\_____  \ /\  _  \/\ \/\ \        /\_ \           __/\ \__   
@@ -504,11 +547,7 @@ print(r"""
                                 \ \_\                         
                                  \/_/                         
 """)
-print("==================")
-print("")
-print("ZAVploit konzole")
-print("")
-print("==================")
+print("===============================================================")
 
 app = App()
 app.mainloop()
