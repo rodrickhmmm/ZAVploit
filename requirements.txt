@@ -1,5 +1,6 @@
-customtkinter==5.2.2
-Pillow==11.2.1
-playwright==1.52.0
-PyAutoGUI==0.9.54
-screeninfo==0.8.1
+playwright
+pyautogui
+screeninfo
+customtkinter
+Pillow
+notifypy

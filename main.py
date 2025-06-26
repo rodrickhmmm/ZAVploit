@@ -10,6 +10,7 @@ import os
 from PIL import Image
 import queue
 from notifypy import Notify
+import json
 
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
