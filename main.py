@@ -9,7 +9,7 @@ import threading
 import os
 from PIL import Image
 import queue
-from notifypy import Notify
+from plyer import notification
 import json
 
 jmeno = None
@@ -22,7 +22,6 @@ context = None
 page = None
 command_queue = queue.Queue()
 kliknuto = 0
-notification = Notify()
 
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -45,46 +44,17 @@ for m in get_monitors():
     vyska = m.height
     sirka = m.width
 
-default_settings = {
-    "jmenoLogin": "default_value",
-    "hesloLogin": "default_value",
-    "autoPrihlasit": "off"
-}
-
-def ulozit_nastaveni():
-    global jmenoLogin, hesloLogin, autoPrihlasit
-    nastaveni = {
-        "jmenoLogin": jmenoLogin,
-        "hesloLogin": hesloLogin,
-        "autoPrihlasit": autoPrihlasit
-    }
-    with open("settings.json", "w", encoding="utf-8") as file:
-        json.dump(nastaveni, file, ensure_ascii=False, indent=4)
-
-# importuje nastavení
-def import1():
-    global jmenoLogin, hesloLogin, autoPrihlasit
-    if os.path.exists("settings.json"):
-        with open("settings.json", "r", encoding="utf-8") as file:
-            try:
-                nastaveni = json.load(file)
-                jmenoLogin = nastaveni.get("jmenoLogin", "default_value")
-                hesloLogin = nastaveni.get("hesloLogin", "default_value")
-                autoPrihlasit = nastaveni.get("autoPrihlasit", "off")
-            except json.JSONDecodeError:
-                input("Soubor settings.json je poškozen, vytvářím výchozí nastavení. Press enter to continue...")
-                with open("settings.json", "w", encoding="utf-8") as file:
-                    json.dump(default_settings, file, ensure_ascii=False, indent=4)
-                import1()
-    else:
-        input("Nastavení nebylo nalezeno, vytvářím výchozí nastavení. Press enter to continue...")
-        with open("settings.json", "w", encoding="utf-8") as file:
-            json.dump(default_settings, file, ensure_ascii=False, indent=4)
-        import1()
-        clear()
-
-
-import1()
+jmeno = None
+heslo = None
+prohlizec = "firefox"
+muzesSpustit = False
+moznost = "Z*V theme"
+browser = None
+context = None
+page = None
+command_queue = queue.Queue()
+kliknuto = 0
+autoPrihlasit = "off"
 
 def Login():
     time.sleep(.1)
@@ -124,10 +94,11 @@ def spustitBrowser():
             print("Přihlášen, teď dává exploit...")
             page.evaluate("document.documentElement.setAttribute('contenteditable', 'true');")
             print("Hotovo!")
-            notification.title = "ZAVploit"
-            notification.message = "Prohlížeč s exploitem načten!"
-            notification.icon = "ikonky\logo.png"
-            notification.send()
+            notification.notify(
+                title="ZAVploit",
+                message="Prohlížeč s exploitem načten!",
+                app_icon="ikonky/logo.png"
+            )
 
             # Main loop to process commands from the queue
             while True:
@@ -151,10 +122,11 @@ def run_browser_thread():
 def make_page_exploited():
     if page is not None:
         command_queue.put("activate_exploit")
-        notification.title = "ZAVploit"
-        notification.message = "Do ZAVu byl znovu injectnut exploit!"
-        notification.icon = "ikonky\logo.png"
-        notification.send()
+        notification.notify(
+            title="ZAVploit",
+            message="Do ZAVu byl znovu injectnut exploit!",
+            app_icon="ikonky/logo.png"
+        )
     else:
         print("Prohlížeč není spuštěn nebo stránka není dostupná.")
         
@@ -190,6 +162,7 @@ def easteregg():
 def changethemezav():
     global moznost
     print("zavtheme")
+    customtkinter.set_appearance_mode("light")
     customtkinter.set_default_color_theme(r"themes\zav.json")
     moznost = "Z*V theme"
     app.recreate_content()  # přidejte tuto metodu do třídy App
@@ -198,6 +171,7 @@ def changethemezav():
 def changethemebreeze():
     global moznost
     print("breezetheme")
+    customtkinter.set_appearance_mode("light")
     customtkinter.set_default_color_theme(r"themes\breeze.json")
     moznost = "Breeze theme"
     app.recreate_content()  # přidejte tuto metodu do třídy App
@@ -206,6 +180,7 @@ def changethemebreeze():
 def changethememidnight():
     global moznost
     print("midnighttheme")
+    customtkinter.set_appearance_mode("light")
     customtkinter.set_default_color_theme(r"themes\midnight.json")
     moznost = "Midnight theme"
     app.recreate_content()  # přidejte tuto metodu do třídy App
@@ -213,32 +188,63 @@ def changethememidnight():
     
 # Funkce na meneni themu---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+# Funkce pro ukladani nastaveni
+def ulozit_nastaveni():
+    """Funkce pro uložení nastavení do souboru"""
+    try:
+        nastaveni = {
+            "auto_prihlasit": autoPrihlasit if 'autoPrihlasit' in globals() else "off"
+        }
+        with open("nastaveni.json", "w", encoding="utf-8") as f:
+            json.dump(nastaveni, f, ensure_ascii=False, indent=2)
+        print("Nastavení uloženo")
+    except Exception as e:
+        print(f"Chyba při ukládání nastavení: {e}")
+
+def nacist_nastaveni():
+    """Funkce pro načtení nastavení ze souboru"""
+    global autoPrihlasit
+    try:
+        with open("nastaveni.json", "r", encoding="utf-8") as f:
+            nastaveni = json.load(f)
+        autoPrihlasit = nastaveni.get("auto_prihlasit", "off")
+        print("Nastavení načteno")
+    except FileNotFoundError:
+        autoPrihlasit = "off"
+        print("Soubor s nastavením nenalezen, použity výchozí hodnoty")
+    except Exception as e:
+        autoPrihlasit = "off"
+        print(f"Chyba při načítání nastavení: {e}")
 
 # Samotný GUI---------------------------------------------------------------------------------------------------------------------------------------------------------------------------    
 class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
-        global jmeno, heslo, prohlizec, check_firefox, jmenoLogin, hesloLogin, autoPrihlasit
+        global jmeno, heslo, prohlizec, check_firefox
+        
+        # Force light appearance mode to maintain consistent look
+        customtkinter.set_appearance_mode("light")
+        
         self.title("ZAVploit")
         self.geometry("800x400")
         self.resizable(width=False, height=False)
-        self.iconbitmap('ikonky\icon.ico')
-        customtkinter.set_default_color_theme("themes\zav.json")
+        self.iconbitmap(r'ikonky\icon.ico')
+        customtkinter.set_default_color_theme(r"themes\zav.json")
         
         # --- NAČTENÍ IKON ---
         self.home_icon = customtkinter.CTkImage(
-            light_image=Image.open("ikonky\home_icon.png"),
-            dark_image=Image.open("ikonky\home_icon.png"),
+            light_image=Image.open(r"ikonky\home_icon.png"),
+            dark_image=Image.open(r"ikonky\home_icon.png"),
             size=(40, 40)
         )
         self.settings_icon = customtkinter.CTkImage(
-            light_image=Image.open("ikonky\settings_icon.png"),
-            dark_image=Image.open("ikonky\settings_icon.png"),
+            light_image=Image.open(r"ikonky\settings_icon.png"),
+            dark_image=Image.open(r"ikonky\settings_icon.png"),
             size=(40, 40)
         )
         self.logo_icon = customtkinter.CTkImage(
-            light_image=Image.open("ikonky\logo.png"),
-            dark_image=Image.open("ikonky\logo.png"),
+            light_image=Image.open(r"ikonky\logo.png"),
+            dark_image=Image.open(r"ikonky\logo.png"),
             size=(120, 120)
         )
 
@@ -604,6 +610,9 @@ print(r"""
                                  \/_/                         
 """)
 print("===============================================================")
+
+# Načtení nastavení při spuštění
+nacist_nastaveni()
 
 app = App()
 app.mainloop()

@@ -3,4 +3,4 @@ pyautogui
 screeninfo
 customtkinter
 Pillow
-notifypy
+plyer
