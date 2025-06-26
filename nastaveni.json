@@ -1,3 +1,5 @@
 {
-  "auto_prihlasit": "on"
+  "autoPrihlasit": "on",
+  "jmenoLogin": "t",
+  "hesloLogin": "nr71"
 }

@@ -55,24 +55,40 @@ page = None
 command_queue = queue.Queue()
 kliknuto = 0
 autoPrihlasit = "off"
-
+        
 def Login():
-    time.sleep(.1)
-    pyautogui.typewrite(jmeno, interval=0)
-    pyautogui.press("tab")
-    print("Zadává heslo...")
-    pyautogui.typewrite(heslo, interval=0)
-    pyautogui.press("enter")
+    global jmenoLogin, hesloLogin, autoPrihlasit, jmeno, heslo
+    if autoPrihlasit == "off":
+        time.sleep(.1)
+        pyautogui.typewrite(jmeno, interval=0)
+        pyautogui.press("tab")
+        print("Zadává heslo...")
+        pyautogui.typewrite(heslo, interval=0)
+        pyautogui.press("enter")
+    else:
+        jmeno = jmenoLogin
+        heslo = hesloLogin
+        time.sleep(.1)
+        pyautogui.typewrite(jmenoLogin, interval=0)
+        pyautogui.press("tab")
+        print("Zadává heslo...")
+        pyautogui.typewrite(hesloLogin, interval=0)
+        pyautogui.press("enter")
     
 # Funkce ktera spusti prohlizec---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def spustitBrowser():
     global jmeno, heslo, muzesSpustit, prohlizec
     global browser, context, page
-
-    if muzesSpustit == False:
-        pyautogui.alert("Nejprve zadej jméno a heslo!",title="Error")
-        print("Nejprve zadej jméno a heslo!")
-    else:
+    global autoPrihlasit, jmenoLogin, hesloLogin
+    with open("nastaveni.json", "r", encoding="utf-8") as f:
+        nastaveni = json.load(f)
+        jmeno_v_nastaveni = nastaveni.get("jmenoLogin", "")
+        heslo_v_nastaveni = nastaveni.get("hesloLogin", "")
+        autoLogin = nastaveni.get("autoPrihlasit", "off")
+        
+    if (jmeno_v_nastaveni == "" or heslo_v_nastaveni == "") and autoLogin == "on":
+        pyautogui.alert("Nejprve zadej jméno a heslo!", title="Error")
+    elif (jmeno_v_nastaveni != "" and heslo_v_nastaveni != "") and autoLogin == "on":
         with sync_playwright() as p:
             clear()
             print("ZAVploit browser spuštěn")
@@ -97,7 +113,7 @@ def spustitBrowser():
             notification.notify(
                 title="ZAVploit",
                 message="Prohlížeč s exploitem načten!",
-                app_icon="ikonky/logo.png"
+                app_icon=os.path.abspath("ikonky/icon.ico")
             )
 
             # Main loop to process commands from the queue
@@ -115,6 +131,54 @@ def spustitBrowser():
                     continue
 
             browser.close()
+        
+    if autoLogin == "off":         
+        if muzesSpustit == False:
+            pyautogui.alert("Nejprve zadej jméno a heslo!",title="Error")
+            print("Nejprve zadej jméno a heslo!")
+        else:
+            with sync_playwright() as p:
+                clear()
+                print("ZAVploit browser spuštěn")
+                print("Spouští se:", prohlizec)
+                if prohlizec == "firefox":
+                    browser = p.firefox.launch(headless=False)
+                else:
+                    browser = p.chromium.launch(headless=False)
+                print("Program se spouští v rozlišení:", sirka, "x", vyska)
+                context = browser.new_context(
+                    viewport={"width": sirka, "height": vyska}
+                )
+                page = context.new_page()
+                print("Program otevírá ZAV stránku...")
+                page.goto("https://student.zav.cz/#!/login")
+                print("Zadává jméno...")
+                time.sleep(.1)
+                Login()
+                print("Přihlášen, teď dává exploit...")
+                page.evaluate("document.documentElement.setAttribute('contenteditable', 'true');")
+                print("Hotovo!")
+                notification.notify(
+                    title="ZAVploit",
+                    message="Prohlížeč s exploitem načten!",
+                    app_icon=os.path.abspath("ikonky/icon.ico")
+                )
+
+                # Main loop to process commands from the queue
+                while True:
+                    try:
+                        cmd = command_queue.get(timeout=0.5)
+                        if cmd == "activate_exploit":
+                            page.evaluate("document.documentElement.setAttribute('contenteditable', 'true');")
+                            print("Exploit je znovu aktivován")
+                        elif cmd == "close_browser":
+                            print("Zavírám browser...")
+                            browser.close()
+                            break
+                    except queue.Empty:
+                        continue
+
+                browser.close()
  
 def run_browser_thread():
     threading.Thread(target=spustitBrowser, daemon=True).start()
@@ -125,7 +189,7 @@ def make_page_exploited():
         notification.notify(
             title="ZAVploit",
             message="Do ZAVu byl znovu injectnut exploit!",
-            app_icon="ikonky/logo.png"
+            app_icon=os.path.abspath("ikonky/icon.ico")
         )
     else:
         print("Prohlížeč není spuštěn nebo stránka není dostupná.")
@@ -193,7 +257,9 @@ def ulozit_nastaveni():
     """Funkce pro uložení nastavení do souboru"""
     try:
         nastaveni = {
-            "auto_prihlasit": autoPrihlasit if 'autoPrihlasit' in globals() else "off"
+            "autoPrihlasit": autoPrihlasit if 'autoPrihlasit' in globals() else "off",
+            "jmenoLogin": jmenoLogin if 'jmenoLogin' in globals() else "",
+            "hesloLogin": hesloLogin if 'hesloLogin' in globals() else ""
         }
         with open("nastaveni.json", "w", encoding="utf-8") as f:
             json.dump(nastaveni, f, ensure_ascii=False, indent=2)
@@ -203,17 +269,23 @@ def ulozit_nastaveni():
 
 def nacist_nastaveni():
     """Funkce pro načtení nastavení ze souboru"""
-    global autoPrihlasit
+    global autoPrihlasit, jmenoLogin, hesloLogin
     try:
         with open("nastaveni.json", "r", encoding="utf-8") as f:
             nastaveni = json.load(f)
-        autoPrihlasit = nastaveni.get("auto_prihlasit", "off")
+        autoPrihlasit = nastaveni.get("autoPrihlasit", "off")
+        jmenoLogin = nastaveni.get("jmenoLogin", "")
+        hesloLogin = nastaveni.get("hesloLogin", "")
         print("Nastavení načteno")
     except FileNotFoundError:
         autoPrihlasit = "off"
+        jmenoLogin = ""
+        hesloLogin = ""
         print("Soubor s nastavením nenalezen, použity výchozí hodnoty")
     except Exception as e:
         autoPrihlasit = "off"
+        jmenoLogin = ""
+        hesloLogin = ""
         print(f"Chyba při načítání nastavení: {e}")
 
 # Samotný GUI---------------------------------------------------------------------------------------------------------------------------------------------------------------------------    
@@ -311,27 +383,42 @@ class App(customtkinter.CTk):
         self.login_frame.place(x=10, y=10)
 
         def clicked():
-            global jmeno, heslo, muzesSpustit
+            global jmeno, heslo, muzesSpustit, jmenoLogin, hesloLogin, autoPrihlasit
             jmeno = jmenoentry.get()
             heslo = hesloentry.get()
-            if jmeno != "":
-                print("Jméno bylo uloženo!")
-                muzesSpustit = True
-            else:
-                print("Není zadané jméno")
-                muzesSpustit = False
-            
-            if heslo != "":
-                print("Heslo bylo uloženo!")
-                muzesSpustit = True
-            else:
-                print("Není zadané heslo")
-                muzesSpustit = False
+            if autoPrihlasit == "off":
+                if jmeno != "":
+                    print("Jméno bylo uloženo!")
+                    muzesSpustit = True
+                else:
+                    muzesSpustit = False
                 
-            if heslo and jmeno !="":
-                0
+                if heslo != "":
+                    print("Heslo bylo uloženo!")
+                    muzesSpustit = True
+                else:
+                    muzesSpustit = False
+                    
+                if heslo and jmeno !="":
+                    muzesSpustit = True
+                else:
+                    pyautogui.alert("Nejprve zadej jméno a heslo!",title="Error")
             else:
-                pyautogui.alert("Nejprve zadej jméno a heslo!",title="Error")
+                with open("nastaveni.json", "r", encoding="utf-8") as f:
+                    nastaveni = json.load(f)
+                    jmeno_v_nastaveni = nastaveni.get("jmenoLogin", "")
+                    heslo_v_nastaveni = nastaveni.get("hesloLogin", "")
+
+                if (jmeno == "" and jmeno_v_nastaveni == "") or (heslo == "" and heslo_v_nastaveni == ""):
+                    pyautogui.alert("Nejprve zadej jméno a heslo!", title="Error")
+                else:
+                    if jmeno != "":
+                        jmenoLogin = jmeno
+                        ulozit_nastaveni()
+                    if heslo != "":
+                        hesloLogin = heslo
+                        ulozit_nastaveni()
+                
 
         jmenoText = customtkinter.CTkLabel(self.login_frame,
                                            text="Jméno",
@@ -443,7 +530,7 @@ class App(customtkinter.CTk):
         
         
     def create_nastaveni_content(self):
-        global moznost
+        global moznost, autoPrihlasit
         
         nastaveni = self.nastaveni_frame
         nastaveni_label = customtkinter.CTkLabel(nastaveni, text="ZAVploit 1.0 Beta \n Rodirck/Rodra_ @2025", font=("Callibri", 10, "italic"), text_color="white")
@@ -488,7 +575,7 @@ class App(customtkinter.CTk):
                 print(autoPrihlasit)
 
 
-        switch_var = customtkinter.StringVar(value="off")
+        switch_var = customtkinter.StringVar(value=autoPrihlasit)
         self.switch = customtkinter.CTkSwitch(self.theme_frame, text="Automat. přihlásit", font=("Segoe UI", 25) , command=switch_event,
                                  variable=switch_var, onvalue="on", offvalue="off")
         self.switch.place(x=30,y=220)
@@ -616,3 +703,5 @@ nacist_nastaveni()
 
 app = App()
 app.mainloop()
+
+
