@@ -445,16 +445,18 @@ class App(customtkinter.CTk):
         )
         hesloentry.place(x=20, y=150)
         
-        ulozitUdajeBTN = customtkinter.CTkButton(
+        # --- ZMĚNA: tlačítko uložitUdajeBTN jako atribut třídy ---
+        self.ulozitUdajeBTN = customtkinter.CTkButton(
             self.login_frame,
-            text="Dočasně uložit",
+            text="Uložit údaje",  # Text už nemusí být podmíněný, nastaví se hned pod tím
             font=("", 40),
             corner_radius=50,
             width=300,
             text_color="white",
             command=clicked,
         )
-        ulozitUdajeBTN.place(x=20,y=200)
+        self.ulozitUdajeBTN.place(x=20, y=200)
+        self.update_ulozitUdajeBTN_text()  # <-- Přidej tento řádek
 
         # --- BROWSER FRAME (pro checkboxy) ---
         self.browser_frame = customtkinter.CTkFrame(hlavni, width=270, height=190, corner_radius=20)
@@ -573,7 +575,8 @@ class App(customtkinter.CTk):
                 autoPrihlasit = "off"
                 ulozit_nastaveni()
                 print(autoPrihlasit)
-
+            # --- ZMĚNA: aktualizace textu tlačítka ---
+            self.update_ulozitUdajeBTN_text()
 
         switch_var = customtkinter.StringVar(value=autoPrihlasit)
         self.switch = customtkinter.CTkSwitch(self.theme_frame, text="Automat. přihlásit", font=("Segoe UI", 25) , command=switch_event,
@@ -682,6 +685,13 @@ class App(customtkinter.CTk):
         self.create_hlavni_content()
         self.create_nastaveni_content()
         self.show_hlavni()
+        
+    def update_ulozitUdajeBTN_text(self):
+        if hasattr(self, "ulozitUdajeBTN"):
+            if autoPrihlasit == "off":
+                self.ulozitUdajeBTN.configure(text="Dočasně uložit")
+            else:
+                self.ulozitUdajeBTN.configure(text="Uložit údaje")
 # Samotný GUI---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 print("===============================================================")
