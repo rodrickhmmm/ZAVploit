@@ -1,5 +1,6 @@
 # ZAVploit
 
+# 
 from playwright.sync_api import sync_playwright
 import time
 import pyautogui
@@ -11,20 +12,23 @@ from PIL import Image
 import queue
 from plyer import notification
 import json
+import tkinter as tk
+from tkinter import ttk
+from tkinter.messagebox import askyesno, askquestion
+from tkinter import messagebox 
 
 jmeno = None
 heslo = None
 prohlizec = "firefox"
 muzesSpustit = False
-moznost = "Z*V theme"
 browser = None
 context = None
-page = None
+zav = None
 command_queue = queue.Queue()
 kliknuto = 0
 
-def clear():
-    os.system('cls' if os.name == 'nt' else 'clear')
+def Clear():
+    os.system('cls' if os.name == 'nt' else 'Clear')
     print("===============================================================")
     print(r"""
  ________   ______  __  __          ___               __      
@@ -43,22 +47,12 @@ def clear():
 for m in get_monitors():
     vyska = m.height
     sirka = m.width
-
-jmeno = None
-heslo = None
-prohlizec = "firefox"
-muzesSpustit = False
-moznost = "Z*V theme"
-browser = None
-context = None
-page = None
-command_queue = queue.Queue()
-kliknuto = 0
-autoPrihlasit = "off"
         
 def Login():
     global jmenoLogin, hesloLogin, autoPrihlasit, jmeno, heslo
+    
     if autoPrihlasit == "off":
+        print("Zadává jméno...")
         time.sleep(.1)
         pyautogui.typewrite(jmeno, interval=0)
         pyautogui.press("tab")
@@ -66,8 +60,7 @@ def Login():
         pyautogui.typewrite(heslo, interval=0)
         pyautogui.press("enter")
     else:
-        jmeno = jmenoLogin
-        heslo = hesloLogin
+        print("Zadává jméno...")
         time.sleep(.1)
         pyautogui.typewrite(jmenoLogin, interval=0)
         pyautogui.press("tab")
@@ -77,9 +70,8 @@ def Login():
     
 # Funkce ktera spusti prohlizec---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def spustitBrowser():
-    global jmeno, heslo, muzesSpustit, prohlizec
-    global browser, context, page
-    global autoPrihlasit, jmenoLogin, hesloLogin
+    global jmeno, heslo, muzesSpustit, prohlizec, browser, context, page, autoPrihlasit, jmenoLogin, hesloLogin
+    
     with open("nastaveni.json", "r", encoding="utf-8") as f:
         nastaveni = json.load(f)
         jmeno_v_nastaveni = nastaveni.get("jmenoLogin", "")
@@ -87,28 +79,24 @@ def spustitBrowser():
         autoLogin = nastaveni.get("autoPrihlasit", "off")
         
     if (jmeno_v_nastaveni == "" or heslo_v_nastaveni == "") and autoLogin == "on":
-        pyautogui.alert("Nejprve zadej jméno a heslo!", title="Error")
+        messagebox.showerror("Error", "Nejprve zadej jméno a heslo!") 
     elif (jmeno_v_nastaveni != "" and heslo_v_nastaveni != "") and autoLogin == "on":
         with sync_playwright() as p:
-            clear()
-            print("ZAVploit browser spuštěn")
+            Clear()
+            print("ZAVploit prohlížeč spuštěn")
             print("Spouští se:", prohlizec)
             if prohlizec == "firefox":
                 browser = p.firefox.launch(headless=False)
             else:
                 browser = p.chromium.launch(headless=False)
             print("Program se spouští v rozlišení:", sirka, "x", vyska)
-            context = browser.new_context(
-                viewport={"width": sirka, "height": vyska}
-            )
-            page = context.new_page()
+            context = browser.new_context(viewport={"width": sirka, "height": vyska})
+            zav = context.new_page()
             print("Program otevírá ZAV stránku...")
-            page.goto("https://student.zav.cz/#!/login")
-            print("Zadává jméno...")
-            time.sleep(.1)
+            zav.goto("https://student.zav.cz/#!/login")
             Login()
             print("Přihlášen, teď dává exploit...")
-            page.evaluate("document.documentElement.setAttribute('contenteditable', 'true');")
+            zav.evaluate("document.documentElement.setAttribute('contenteditable', 'true');")
             print("Hotovo!")
             notification.notify(
                 title="ZAVploit",
@@ -120,8 +108,8 @@ def spustitBrowser():
             while True:
                 try:
                     cmd = command_queue.get(timeout=0.5)
-                    if cmd == "activate_exploit":
-                        page.evaluate("document.documentElement.setAttribute('contenteditable', 'true');")
+                    if cmd == "aktivovat_exploit":
+                        zav.evaluate("document.documentElement.setAttribute('contenteditable', 'true');")
                         print("Exploit je znovu aktivován")
                     elif cmd == "close_browser":
                         print("Zavírám browser...")
@@ -134,11 +122,11 @@ def spustitBrowser():
         
     if autoLogin == "off":         
         if muzesSpustit == False:
-            pyautogui.alert("Nejprve zadej jméno a heslo!",title="Error")
+            messagebox.showerror("Error", "Nejprve zadej jméno a heslo!") 
             print("Nejprve zadej jméno a heslo!")
         else:
             with sync_playwright() as p:
-                clear()
+                Clear()
                 print("ZAVploit browser spuštěn")
                 print("Spouští se:", prohlizec)
                 if prohlizec == "firefox":
@@ -149,14 +137,14 @@ def spustitBrowser():
                 context = browser.new_context(
                     viewport={"width": sirka, "height": vyska}
                 )
-                page = context.new_page()
+                zav = context.new_page()
                 print("Program otevírá ZAV stránku...")
-                page.goto("https://student.zav.cz/#!/login")
+                zav.goto("https://student.zav.cz/#!/login")
                 print("Zadává jméno...")
                 time.sleep(.1)
                 Login()
                 print("Přihlášen, teď dává exploit...")
-                page.evaluate("document.documentElement.setAttribute('contenteditable', 'true');")
+                zav.evaluate("document.documentElement.setAttribute('contenteditable', 'true');")
                 print("Hotovo!")
                 notification.notify(
                     title="ZAVploit",
@@ -168,8 +156,8 @@ def spustitBrowser():
                 while True:
                     try:
                         cmd = command_queue.get(timeout=0.5)
-                        if cmd == "activate_exploit":
-                            page.evaluate("document.documentElement.setAttribute('contenteditable', 'true');")
+                        if cmd == "aktivovat_exploit":
+                            zav.evaluate("document.documentElement.setAttribute('contenteditable', 'true');")
                             print("Exploit je znovu aktivován")
                         elif cmd == "close_browser":
                             print("Zavírám browser...")
@@ -184,8 +172,8 @@ def run_browser_thread():
     threading.Thread(target=spustitBrowser, daemon=True).start()
     
 def make_page_exploited():
-    if page is not None:
-        command_queue.put("activate_exploit")
+    if zav is not None:
+        command_queue.put("aktivovat_exploit")
         notification.notify(
             title="ZAVploit",
             message="Do ZAVu byl znovu injectnut exploit!",
@@ -195,21 +183,25 @@ def make_page_exploited():
         print("Prohlížeč není spuštěn nebo stránka není dostupná.")
         
 def close_browser():
-    if page is not None:
+    if zav is not None:
         command_queue.put("close_browser")
     else:
         print("Prohlížeč není spuštěn nebo stránka není dostupná.")
-    
+
+# Funkce ktera spusti prohlizec---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
 def eastereggvideo():
     with sync_playwright() as p:
         browser = p.firefox.launch(headless=False)
         context = browser.new_context(
             viewport={"width": sirka, "height": vyska}
         )
-        page = context.new_page()
-        page.goto("https://packaged-media.redd.it/gq3bpywa60cb1/pb/m2-res_720p.mp4?m=DASHPlaylist.mpd&v=1&e=1750798800&s=0e156566946e5c307a649bcad3ead5d924003892")
+        zav = context.new_page()
+        zav.goto("https://packaged-media.redd.it/gq3bpywa60cb1/pb/m2-res_720p.mp4?m=DASHPlaylist.mpd&v=1&e=1750798800&s=0e156566946e5c307a649bcad3ead5d924003892")
         time.sleep(10000)
         browser.close()
+        
 def easteregg():
     global kliknuto
     kliknuto += 1
@@ -218,37 +210,20 @@ def easteregg():
         threading.Thread(target=eastereggvideo, daemon=True).start()
         time.sleep(15)
         exit()
-# Funkce ktera spusti prohlizec---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 
 # Funkce na meneni themu---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-def changethemezav():
-    global moznost
-    print("zavtheme")
-    customtkinter.set_appearance_mode("light")
-    customtkinter.set_default_color_theme(r"themes\zav.json")
-    moznost = "Z*V theme"
+def changetheme(theme, nazev):
+    global moznost, tema
+    customtkinter.set_appearance_mode("System")
+    customtkinter.set_default_color_theme(fr"themes\{theme}.json")
+    moznost = nazev
+    tema = theme
+    ulozit_nastaveni()
     app.recreate_content()  # přidejte tuto metodu do třídy App
-    clear()
-
-def changethemebreeze():
-    global moznost
-    print("breezetheme")
-    customtkinter.set_appearance_mode("light")
-    customtkinter.set_default_color_theme(r"themes\breeze.json")
-    moznost = "Breeze theme"
-    app.recreate_content()  # přidejte tuto metodu do třídy App
-    clear()
-
-def changethememidnight():
-    global moznost
-    print("midnighttheme")
-    customtkinter.set_appearance_mode("light")
-    customtkinter.set_default_color_theme(r"themes\midnight.json")
-    moznost = "Midnight theme"
-    app.recreate_content()  # přidejte tuto metodu do třídy App
-    clear()
+    Clear()
+    print(nazev)
     
 # Funkce na meneni themu---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -259,7 +234,9 @@ def ulozit_nastaveni():
         nastaveni = {
             "autoPrihlasit": autoPrihlasit if 'autoPrihlasit' in globals() else "off",
             "jmenoLogin": jmenoLogin if 'jmenoLogin' in globals() else "",
-            "hesloLogin": hesloLogin if 'hesloLogin' in globals() else ""
+            "hesloLogin": hesloLogin if 'hesloLogin' in globals() else "",
+            "tema": tema if 'tema' in globals() else "zav",
+            "moznost": moznost if "moznost" in globals() else "Z*V theme"
         }
         with open("nastaveni.json", "w", encoding="utf-8") as f:
             json.dump(nastaveni, f, ensure_ascii=False, indent=2)
@@ -269,30 +246,36 @@ def ulozit_nastaveni():
 
 def nacist_nastaveni():
     """Funkce pro načtení nastavení ze souboru"""
-    global autoPrihlasit, jmenoLogin, hesloLogin
+    global autoPrihlasit, jmenoLogin, hesloLogin, tema, moznost
     try:
         with open("nastaveni.json", "r", encoding="utf-8") as f:
             nastaveni = json.load(f)
         autoPrihlasit = nastaveni.get("autoPrihlasit", "off")
         jmenoLogin = nastaveni.get("jmenoLogin", "")
         hesloLogin = nastaveni.get("hesloLogin", "")
+        tema = nastaveni.get("tema","zav")
+        moznost = nastaveni.get("moznost", "Z*V theme")
         print("Nastavení načteno")
     except FileNotFoundError:
         autoPrihlasit = "off"
         jmenoLogin = ""
         hesloLogin = ""
+        tema = "zav"           # <-- přidej toto
+        moznost = "Z*V theme"  # <-- přidej toto
         print("Soubor s nastavením nenalezen, použity výchozí hodnoty")
     except Exception as e:
         autoPrihlasit = "off"
         jmenoLogin = ""
         hesloLogin = ""
+        tema = "zav"           # <-- přidej toto
+        moznost = "Z*V theme"  # <-- přidej toto
         print(f"Chyba při načítání nastavení: {e}")
 
 # Samotný GUI---------------------------------------------------------------------------------------------------------------------------------------------------------------------------    
 class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
-        global jmeno, heslo, prohlizec, check_firefox
+        global jmeno, heslo, prohlizec, check_firefox, tema
         
         # Force light appearance mode to maintain consistent look
         customtkinter.set_appearance_mode("light")
@@ -301,7 +284,7 @@ class App(customtkinter.CTk):
         self.geometry("800x400")
         self.resizable(width=False, height=False)
         self.iconbitmap(r'ikonky\icon.ico')
-        customtkinter.set_default_color_theme(r"themes\zav.json")
+        customtkinter.set_default_color_theme(fr"themes\{tema}.json")
         
         # --- NAČTENÍ IKON ---
         self.home_icon = customtkinter.CTkImage(
@@ -402,7 +385,7 @@ class App(customtkinter.CTk):
                 if heslo and jmeno !="":
                     muzesSpustit = True
                 else:
-                    pyautogui.alert("Nejprve zadej jméno a heslo!",title="Error")
+                    messagebox.showerror("Error", "Nejprve zadej jméno a heslo!")  
             else:
                 with open("nastaveni.json", "r", encoding="utf-8") as f:
                     nastaveni = json.load(f)
@@ -410,7 +393,7 @@ class App(customtkinter.CTk):
                     heslo_v_nastaveni = nastaveni.get("hesloLogin", "")
 
                 if (jmeno == "" and jmeno_v_nastaveni == "") or (heslo == "" and heslo_v_nastaveni == ""):
-                    pyautogui.alert("Nejprve zadej jméno a heslo!", title="Error")
+                    messagebox.showerror("Error", "Nejprve zadej jméno a heslo!")  
                 else:
                     if jmeno != "":
                         jmenoLogin = jmeno
@@ -548,16 +531,47 @@ class App(customtkinter.CTk):
             print("optionmenu dropdown clicked:", choice)
             
             if choice == "Z*V theme":
-                changethemezav()
+                changetheme("zav","Z*V theme")
                 
             elif choice == "Breeze theme":
-                changethemebreeze()
+                changetheme("breeze","Breeze theme")
                 
             elif choice == "Midnight theme":
-                changethememidnight()
+                changetheme("midnight","Midnight theme")
+                
+            elif choice == "Metal theme":
+                changetheme("metal","Metal theme")
+            
+            elif choice == "Rime theme":
+                changetheme("rime", "Rime theme")
+            
+            elif choice == "Coffee theme":
+                changetheme("coffee", "Coffee theme")
+            
+            elif choice == "Orange theme":
+                changetheme("orange","Orange theme")
+                
+            elif choice == "Violet theme":
+                changetheme("violet","Violet theme")
+            
+            elif choice == "Autumn theme":
+                changetheme("autumn","Autumn theme")
+            
+            elif choice == "Red theme":
+                changetheme("red","Red theme")
+            
         
         optionmenu_var = customtkinter.StringVar(value=moznost)
-        self.optionmenu = customtkinter.CTkOptionMenu(self.theme_frame,values=["Z*V theme", "Breeze theme", "Midnight theme"],
+        self.optionmenu = customtkinter.CTkOptionMenu(self.theme_frame,values=["Z*V theme",
+                                                                               "Breeze theme",
+                                                                               "Midnight theme",
+                                                                               "Metal theme",
+                                                                               "Rime theme",
+                                                                               "Coffee theme",
+                                                                               "Orange theme",
+                                                                               "Violet theme",
+                                                                               "Autumn theme",
+                                                                               "Red theme"],
                                                  command=optionmenu_callback,
                                                  variable=optionmenu_var,
                                                  font=("Segoe UI", 25),
@@ -568,14 +582,23 @@ class App(customtkinter.CTk):
             global jmenoLogin, hesloLogin, autoPrihlasit
             onOff = switch_var.get()
             if onOff == "on":
-                autoPrihlasit = "on"
-                ulozit_nastaveni()
-                print(autoPrihlasit)
+                answer = askquestion(
+                    title='Potvrzení',
+                    message='Jsi si jistý že chceš zapnout automatické přihlášení? \n tvé přihlašovací údaje se uloží do nešifrovaného souboru!'
+                )
+                if answer == "yes":
+                    autoPrihlasit = "on"
+                    ulozit_nastaveni()
+                    print(autoPrihlasit)
+                if answer == "no":
+                    autoPrihlasit = "off"
+                    ulozit_nastaveni()
+                    switch_var.set("off")  # <-- Přidej toto!
+                    print(autoPrihlasit)
             else:
                 autoPrihlasit = "off"
                 ulozit_nastaveni()
                 print(autoPrihlasit)
-            # --- ZMĚNA: aktualizace textu tlačítka ---
             self.update_ulozitUdajeBTN_text()
 
         switch_var = customtkinter.StringVar(value=autoPrihlasit)
@@ -592,7 +615,7 @@ class App(customtkinter.CTk):
         self.button = customtkinter.CTkButton(
             self.browser_options_frame,
             text="Zaktivuj znovu exploit",
-            font=("Sergoe UI", 27),
+            font=("Segoe UI", 27),
             height=45,
             text_color="white",
             command=make_page_exploited,
@@ -610,7 +633,7 @@ class App(customtkinter.CTk):
         self.button = customtkinter.CTkButton(
             self.browser_options_frame,
             text="Znovu přihlásit",
-            font=("Sergoe UI", 27),
+            font=("Segoe UI", 27),
             height=45,
             text_color="white",
             command=Login2,
@@ -620,7 +643,7 @@ class App(customtkinter.CTk):
         self.button = customtkinter.CTkButton(
             self.browser_options_frame,
             text="Vypni prohlížeč",
-            font=("Sergoe UI", 27),
+            font=("Segoe UI", 27),
             height=45,
             text_color="white",
             command=close_browser,
