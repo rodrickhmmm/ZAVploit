@@ -1,6 +1,6 @@
 # ZAVploit
 
-# 
+# Importnutí knihoven
 from playwright.sync_api import sync_playwright
 import time
 import pyautogui
@@ -70,14 +70,14 @@ def Login():
     
 # Funkce ktera spusti prohlizec---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def spustitBrowser():
-    global jmeno, heslo, muzesSpustit, prohlizec, browser, context, page, autoPrihlasit, jmenoLogin, hesloLogin
+    global jmeno, heslo, muzesSpustit, prohlizec, browser, context, zav, autoPrihlasit, jmenoLogin, hesloLogin, autoLogin
     
     with open("nastaveni.json", "r", encoding="utf-8") as f:
         nastaveni = json.load(f)
         jmeno_v_nastaveni = nastaveni.get("jmenoLogin", "")
         heslo_v_nastaveni = nastaveni.get("hesloLogin", "")
         autoLogin = nastaveni.get("autoPrihlasit", "off")
-        
+    
     if (jmeno_v_nastaveni == "" or heslo_v_nastaveni == "") and autoLogin == "on":
         messagebox.showerror("Error", "Nejprve zadej jméno a heslo!") 
     elif (jmeno_v_nastaveni != "" and heslo_v_nastaveni != "") and autoLogin == "on":
@@ -736,5 +736,3 @@ nacist_nastaveni()
 
 app = App()
 app.mainloop()
-
-
