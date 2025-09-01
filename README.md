@@ -45,9 +45,9 @@ ZAVploit je desktopová aplikace napsaná v pythonu, která slouží jako exploi
   - spuštění samotného exploitu.
 
 - V nastavení:
-  - výběř motivů
+  - výběr motivů
   - zapnutí/vypnutí automatického přihlášení
-  - nastavení exploitu 
+  - nastavení exploitu:
     - zaktivovat znovu exploit
     - přihlásit znovu
     - vypnout prohlížeč.
