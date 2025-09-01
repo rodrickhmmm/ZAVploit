@@ -3,7 +3,7 @@
 > **VAROVÁNÍ:** Autor nenese žádnou zodpovědnost za jakékoliv použití tohoto programu. Používání této aplikace může být v rozporu s podmínkami služby [student.zav.cz](https://student.zav.cz/#!/login) nebo jinými právními předpisy. **Projekt je určen pouze pro vzdělávací účely. Používejte na vlastní nebezpečí! Silně nedoporučováno používat ve škole.**
 <br> Neboli - pokud vás někdo chytne, že tento program používáte, je to vaše chyba a ne autora tohoto programu.
 
-![Logo](./ikonky/logo.png)
+![Logo](./ikonky/icon.png)
 
 ZAVploit je desktopová aplikace napsaná v pythonu, která slouží jako exploit [ZAVu](https://student.zav.cz/#!/login). Hlavním cílem je zpřístupnění backspacu v jakémkoliv cvičení, bez mučení mozku, když uděláte chybu. 
 
