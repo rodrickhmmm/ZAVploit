@@ -57,9 +57,15 @@ ZAVploit je desktopová aplikace napsaná v pythonu, která slouží jako exploi
 
 - Projekt je ve stádiu "Beta", může obsahovat chyby.
 
+## QnA
+
+"Nešel by udělat i program který by za tebe v ZAVu psal?" Bohužel ne. S kamarádem jsme tohle zkoušeli, já napsal program v Pythonu, on v C#. Oba programy ZAV detekoval a napsal varování.
+
+"Proč by jsi vůbec takový program dělal?" Protože sám vím jaké mučení ten program je - jednu dobu jsem tam míval okolo 50 chyb kvůli mé nekorigované rychlosti. Proto když jsem přišel jak alespoň mazat text ve všech cvičeních, tak jsem chtěl udělat program, ktertý dokáže pochopit skoro každý jak nastavit a který pomůže také ostatním.
+
 ## Licence
 
-Tento projekt je určen pouze pro vzdělávací účely. Používejte zodpovědně!
+Tento projekt je určen pouze pro vzdělávací účely. Používejte zodpovědně! 
 
 ---
 
