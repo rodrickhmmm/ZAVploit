@@ -29,10 +29,10 @@ ZAVploit je desktopová aplikace napsaná v pythonu, která slouží jako exploi
 
 3. **Spuštění aplikace**
 
-    EXE soubor:
-    - stačí jenom spustit `ZAVploit.exe` a orogram se vám rovnou načte
+    Přes EXE soubor:
+    - stačí jenom spustit `ZAVploit.exe` a program se vám rovnou načte
 
-   Batch soubor:
+   Přes Batch soubor:
     - Windows: Spusťte soubor `ZAVploit.bat`
     - Nebo přímo pomocí příkazového řádku:
       ```bash
