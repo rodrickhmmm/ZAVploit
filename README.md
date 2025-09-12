@@ -28,16 +28,21 @@ ZAVploit je desktopová aplikace napsaná v pythonu, která slouží jako exploi
    - na instalaci všech potřebných věcí spusťte **install.bat**. Tento soubor nainstaluje všechny potřebné knihony a samotný Python.
 
 3. **Spuštění aplikace**
-   - Windows: Spusťte soubor `ZAVploit.bat`
-   - Nebo přímo pomocí příkazového řádku:
-     ```bash
-     python main.py
-     ```
+
+    EXE soubor:
+    - stačí jenom spustit `ZAVploit.exe` a orogram se vám rovnou načte
+
+   Batch soubor:
+    - Windows: Spusťte soubor `ZAVploit.bat`
+    - Nebo přímo pomocí příkazového řádku:
+      ```bash
+      python main.py
+      ```
 
 ## Použití
   ![Preview](./readme/preview.png)
-- poté, co spustíte `ZAVploit.bat`, se vám zobrazí GUI a ZAVploit "konzole"
-- ZAVploit "konzole" si nemusíte všímat a můžete si to skrýt (bacha, nezavírat - to zavře celý program!), funguje jako menší debug (nebo pokud se chcete cítit jako "hacker", tak si to můžete nechat otevřené)
+- poté, co spustíte `ZAVploit.exe` se vám zobrazí GUI (když spustíte `ZAVploit.bat` tak i ZAVploit "konzole")
+  - Pokud otevíráte `ZAVploit.bat`: ZAVploit "konzole" si nemusíte všímat a můžete si to skrýt (bacha, nezavírat - to zavře celý program!), funguje jako menší debug (nebo pokud se chcete cítit jako "hacker", tak si to můžete nechat otevřené)
 - V GUI lze přepínat mezi hlavní stránkou a nastavením.
 - Na hlavní stránce najdete:
   - zadání uživatelských údajů
