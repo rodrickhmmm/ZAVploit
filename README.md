@@ -52,6 +52,10 @@ ZAVploit je desktopová aplikace napsaná v pythonu, která slouží jako exploi
     - přihlásit znovu
     - vypnout prohlížeč.
 
+## Cvičení, ve kterých exploit nefunguje
+- Cvičení, kde po každé chybě tě to hodí na další řádek
+- Padající písmenka
+- Teď z hlavy jinak nevim dál, napište kdyžtak do issues nebo něco díky :D
 
 ## Poznámky
 
