@@ -16,6 +16,8 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter.messagebox import askyesno, askquestion
 from tkinter import messagebox 
+import shutil
+import sys
 
 jmeno = None
 heslo = None
@@ -521,7 +523,7 @@ class App(customtkinter.CTk):
         nastaveni_label = customtkinter.CTkLabel(nastaveni, text="ZAVploit 1.0 Beta \n Rodirck/Rodra_ @2025", font=("Callibri", 10, "italic"), text_color="white")
         nastaveni_label.pack(side="right", padx=(0,10), pady=(370,0))
         
-        self.theme_frame = customtkinter.CTkFrame(nastaveni, width=300, height=290, corner_radius=20)
+        self.theme_frame = customtkinter.CTkFrame(nastaveni, width=300, height=330, corner_radius=20)
         self.theme_frame.place(x=10, y=10)
         
         vyberthemetext = customtkinter.CTkLabel(self.theme_frame, text="Nastavení aplikace", font=("Segoe UI", 30)).place(x=30,y=30)
@@ -604,7 +606,17 @@ class App(customtkinter.CTk):
         switch_var = customtkinter.StringVar(value=autoPrihlasit)
         self.switch = customtkinter.CTkSwitch(self.theme_frame, text="Automat. přihlásit", font=("Segoe UI", 25) , command=switch_event,
                                  variable=switch_var, onvalue="on", offvalue="off")
-        self.switch.place(x=30,y=220)
+        self.switch.place(x=30,y=260)
+        
+        deleteZAVploit = customtkinter.CTkButton(
+            nastaveni,
+            text="Auto-destrukce",
+            font=("Segoe UI", 27),
+            height=45,
+            text_color="white",
+            command=self_destruct,  # <-- Add this line
+        )
+        deleteZAVploit.place(x=40,y=210)
         
         self.browser_options_frame = customtkinter.CTkFrame(nastaveni, width=325, height=280, corner_radius=20)
         self.browser_options_frame.place(x=325, y=10)
@@ -715,6 +727,37 @@ class App(customtkinter.CTk):
                 self.ulozitUdajeBTN.configure(text="Dočasně uložit")
             else:
                 self.ulozitUdajeBTN.configure(text="Uložit údaje")
+
+def self_destruct():
+    answer = askyesno(
+        title='Potvrzení self-destrukce',
+        message='Jsi si opravdu jistý, že chceš smazat ZAVploit? \nTato akce je nevratná!'
+    )
+    
+    if answer:
+            try:
+                if 'zav' in globals() and zav is not None:
+                    command_queue.put("close_browser")
+                
+                current_dir = os.getcwd()
+                
+                batch_content = f"""@echo off
+timeout /t 2 /nobreak >nul
+rmdir /s /q "{current_dir}"
+del "%~f0"
+"""
+                
+                with open("self_destruct.bat", "w") as f:
+                    f.write(batch_content)
+                
+                os.system("start self_destruct.bat")
+                sys.exit()
+                
+            except Exception as e:
+                messagebox.showerror("Chyba", f"Sebevražda se nezdařila: {e}")
+    else:
+        messagebox.showinfo("Zrušeno", "Sebevražda zrušena. Program pokračuje.")
+
 # Samotný GUI---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 print("===============================================================")
