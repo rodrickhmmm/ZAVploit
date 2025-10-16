@@ -610,7 +610,7 @@ class App(customtkinter.CTk):
         
         deleteZAVploit = customtkinter.CTkButton(
             nastaveni,
-            text="Auto-destrukce",
+            text="Sebe-destrukce",
             font=("Segoe UI", 27),
             height=45,
             text_color="white",
@@ -730,11 +730,12 @@ class App(customtkinter.CTk):
 
 def self_destruct():
     answer = askyesno(
-        title='Potvrzení self-destrukce',
+        title='Potvrzení sebe-destrukce',
         message='Jsi si opravdu jistý, že chceš smazat ZAVploit? \nTato akce je nevratná!'
     )
     
     if answer:
+            print("Sebe-destrukce začíná...")
             try:
                 if 'zav' in globals() and zav is not None:
                     command_queue.put("close_browser")
@@ -754,9 +755,9 @@ del "%~f0"
                 sys.exit()
                 
             except Exception as e:
-                messagebox.showerror("Chyba", f"Sebevražda se nezdařila: {e}")
+                messagebox.showerror("Chyba", f"Sebe-destrukce se nezdařila: {e}")
     else:
-        messagebox.showinfo("Zrušeno", "Sebevražda zrušena. Program pokračuje.")
+        print("Sebe-destrukce zrušena.")
 
 # Samotný GUI---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
