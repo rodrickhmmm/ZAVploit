@@ -19,11 +19,7 @@ ZAVploit je desktopová aplikace napsaná v pythonu, která slouží jako exploi
 
 ## Instalace
 
-1. **Klonování repozitáře**
-   ```bash
-   git clone https://github.com/rodrickhmmm/ZAVploit.git
-   cd ZAVploit
-   ```
+1. Stáhněte si zdrojový kód z [releases](https://github.com/rodrickhmmm/ZAVploit/releases/tag/v1.0) (`Source code (zip)`), následně tento zip soubor extrahujte a otevřete 
 
 2. **Instalace závislostí**
    - na instalaci všech potřebných věcí spusťte **install.bat**. Tento soubor nainstaluje všechny potřebné knihony a samotný Python.
