@@ -46,9 +46,25 @@ def Clear():
     print("===============================================================")
     print()
 
-for m in get_monitors():
-    vyska = m.height
-    sirka = m.width
+if os.name == "nt":
+    import ctypes
+
+    try:
+        ctypes.windll.shcore.SetProcessDpiAwareness(2)
+    except (AttributeError, OSError):
+        try:
+            ctypes.windll.user32.SetProcessDPIAware()
+        except AttributeError:
+            pass
+
+    sirka = ctypes.windll.user32.GetSystemMetrics(0)
+    vyska = ctypes.windll.user32.GetSystemMetrics(1)
+else:
+    monitory = get_monitors()
+    if monitory:
+        monitor = max(monitory, key=lambda m: m.width * m.height)
+        sirka = monitor.width
+        vyska = monitor.height
         
 def Login():
     global jmenoLogin, hesloLogin, autoPrihlasit, jmeno, heslo

@@ -36,8 +36,15 @@ ZAVploit je desktopová aplikace napsaná v pythonu, která slouží jako exploi
 
 ## Použití
   ![Preview](./readme/preview.png)
-- poté, co spustíte `ZAVploit.bat`, se vám zobrazí GUI a ZAVploit "konzole"
-- ZAVploit "konzole" si nemusíte všímat a můžete si to skrýt (bacha, nezavírat - to zavře celý program!), funguje jako menší debug (nebo pokud se chcete cítit jako "hacker", tak si to můžete nechat otevřené)
+
+### ZAVploit se může spustit dvěma spouštěcími soubory: 
+#### ZAVploit-Konzole.bat
+  - `ZAVploit.bat` je spouštěcí soubor, který vám zobrazí desktopový program a ZAVploit "konzoli"
+  - ZAVploit "konzole" si nemusíte všímat a můžete si ji skrýt (bacha, nezavírat - to zavře celý program!), funguje jako menší debuggovací okénko (nebo pokud se chcete cítit jako "hacker", tak si to můžete nechat otevřené)
+
+#### ZAVploit.bat
+  - `ZAVploit.bat` je spouštěcí soubor, který "konzoli" nezobrazuje, jen samotný desktopový program 
+
 - V GUI lze přepínat mezi hlavní stránkou a nastavením.
 - Na hlavní stránce najdete:
   - zadání uživatelských údajů

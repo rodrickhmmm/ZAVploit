@@ -1,3 +1,4 @@
 @echo off
 TITLE ZAVploit Konzole
-python main.py
+start "" pythonw "main.py"
+exit
