@@ -1,7 +1,8 @@
 # ZAVploit
 
-> **VAROVÁNÍ:** Autor nenese žádnou zodpovědnost za jakékoliv použití tohoto programu. Používání této aplikace může být v rozporu s podmínkami služby [student.zav.cz](https://student.zav.cz/#!/login) nebo jinými právními předpisy. **Projekt je určen pouze pro vzdělávací účely. Používejte na vlastní nebezpečí! Silně nedoporučováno používat ve škole.**
-<br> Neboli - pokud vás někdo chytne, že tento program používáte, je to vaše chyba a ne autora tohoto programu.
+> [!WARNING]
+> Autor nenese žádnou zodpovědnost za jakékoliv použití tohoto programu. Používání této aplikace může být v rozporu s podmínkami služby [student.zav.cz](https://student.zav.cz/#!/login) nebo jinými právními předpisy. **Projekt je určen pouze pro vzdělávací účely. Používejte na vlastní nebezpečí! Silně nedoporučováno používat ve škole.**
+> <br> Neboli - ***pokud vás někdo chytne, že tento program používáte, je to vaše chyba a ne autora tohoto programu.***
 
 ![Logo](./ikonky/icon.png)
 
@@ -64,10 +65,10 @@ ZAVploit je desktopová aplikace napsaná v pythonu, která slouží jako exploi
 - Padající písmenka
 - Teď z hlavy jinak nevim dál, napište kdyžtak do issues nebo něco díky :D
 
-## Poznámky
+> [!NOTE]
+> Projekt je ve stádiu "Beta", může obsahovat chyby.
 
-- Projekt je ve stádiu "Beta", může obsahovat chyby.
-
+<br><br>
 ## QnA
 
 "Nešel by udělat i program který by za tebe v ZAVu psal?" Bohužel ne. S kamarádem jsme tohle zkoušeli, já napsal program v Pythonu, on v C#. Oba programy ZAV detekoval a napsal varování.
@@ -79,5 +80,5 @@ ZAVploit je desktopová aplikace napsaná v pythonu, která slouží jako exploi
 Tento projekt je určen pouze pro vzdělávací účely. Používejte zodpovědně! 
 
 ---
-
-**Pokud narazíte na chybu nebo máte nápad na vylepšení, neváhejte otevřít [issues stránku](https://github.com/rodrickhmmm/ZAVploit/issues)!**
+> [!CAUTION]
+> **Pokud narazíte na chybu nebo máte nápad na vylepšení, neváhejte otevřít [issues stránku](https://github.com/rodrickhmmm/ZAVploit/issues)!**
